@@ -4,31 +4,62 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!--
+  Everything above this comment imports the XML Schema for a Maven project.
+  See https://maven.apache.org/pom.html for more in-depth info on the pom structure and settings.
+
+  Defines the groupId (the company/person/group name which makes this)
+  project name (artifactId), packaging type, and release version.
+  See https://maven.apache.org/guides/mini/guide-naming-conventions.html for more info.
+  -->
   <groupId>com.codeforcommunity</groupId>
   <artifactId>jumpstart-backend</artifactId>
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
 
+  <!--
+  Defines modules that this project is split into. We have the api and service sub-directories
+  in the project root directory, which all of our code sits in, so we need to declare them as
+  things that should get compiled as part of this.
+  -->
   <modules>
     <module>api</module>
     <module>service</module>
   </modules>
 
+  <!--
+  Defines properties of the build.
+  We want the project to be built using Java 11, so that's set here.
+  -->
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
+  <!-- Defines build behavior. -->
   <build>
+    <!--
+    The default Maven goal. When you type 'mvn' into the terminal, it will automatically run
+    'mvn clean spotless:apply install' for you.
+    -->
     <defaultGoal>clean spotless:apply install</defaultGoal>
+    <!--
+    Declares plugins that can be used by submodules. Anything with '<...Management>' as a tag name
+    imports something for submodules to use, but are not used in the root pom.
+    -->
     <pluginManagement>
+      <!-- A list of plugins that can be used by the submodules. -->
       <plugins>
-        <!-- Used for running the main class -->
+        <!-- A plugin used for running the main class. -->
         <plugin>
+          <!-- The groupId. Same as above, but for someone else's stuff we want to import. -->
           <groupId>org.codehaus.mojo</groupId>
+          <!-- The artifactId. Same as above, but for the specific library/plugin we want. -->
           <artifactId>exec-maven-plugin</artifactId>
+          <!-- The release version. Same as above, but choose the specific version we want. -->
           <version>1.6.0</version>
+          <!-- Defines when or how we want this to run. -->
           <executions>
             <execution>
               <goals>
@@ -36,32 +67,39 @@
               </goals>
             </execution>
           </executions>
+          <!-- Sets up configuration items for the plugin. -->
           <configuration>
             <mainClass>com.codeforcommunity.ServiceMain</mainClass>
           </configuration>
         </plugin>
+        <!-- Used for running unit tests. -->
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.22.2</version>
         </plugin>
       </plugins>
     </pluginManagement>
+    <!-- Plugins that will be used by the main pom. -->
     <plugins>
       <plugin>
-        <!-- formatter, run with spotless:apply (check with spotless:check) -->
+        <!-- Formatter, run with spotless:apply (check with spotless:check) to format your code. -->
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
         <version>1.31.0</version>
         <configuration>
           <java>
+            <!-- The specific version of formatting we want to apply. -->
             <googleJavaFormat>
               <version>1.7</version>
             </googleJavaFormat>
+            <!-- Remove trailing whitespace. -->
             <trimTrailingWhitespace/>
+            <!-- Remove unused imports. -->
             <removeUnusedImports/>
           </java>
         </configuration>
         <executions>
+          <!-- Run spotless:apply during the validate phase. -->
           <execution>
             <id>spotless-apply</id>
             <phase>validate</phase>
@@ -74,37 +112,45 @@
     </plugins>
   </build>
 
+  <!--
+  Define dependencies for modules to use. Usually versions are declared here, and then in the
+  modules, only the groupId and artifactId (and sometimes the scope) need to be declared, so all
+  dependencies can have the same version across modules.
+  -->
   <dependencyManagement>
     <dependencies>
-      <!-- Used for general Vertx utilities in API server stuff -->
+      <!--
+      Used for general Vertx utilities in API server stuff. Runs a lot of the low-level server stuff
+      we don't want to have to deal with.
+      -->
       <dependency>
         <groupId>io.vertx</groupId>
         <artifactId>vertx-core</artifactId>
         <version>3.8.5</version>
       </dependency>
 
-      <!-- Used for API routing -->
+      <!-- Used for API routing. Allows us to specify web routes and handlers for those routes. -->
       <dependency>
         <groupId>io.vertx</groupId>
         <artifactId>vertx-web</artifactId>
         <version>3.8.5</version>
       </dependency>
 
-      <!-- Postgresql driver -->
+      <!-- PostgreSQL driver. Allows us to communicate with the database. -->
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>42.2.5</version>
       </dependency>
 
-      <!-- Jackson Unmarshalling -->
+      <!-- Jackson Unmarshalling. Takes JSONs and turns them into Java objects that we define. -->
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
         <version>2.9.10.4</version>
       </dependency>
 
-      <!-- Used to log events -->
+      <!-- Used to log stuff that happens. Provides nice things for you to log stuff with. -->
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-api</artifactId>
@@ -116,19 +162,23 @@
         <version>2.13.2</version>
       </dependency>
 
-      <!-- Used for testing -->
+      <!-- Used for testing. Provides you stuff to check-expect in your testing. -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
         <version>5.5.2</version>
         <scope>test</scope>
       </dependency>
+
+      <!-- Used for testing. Actually runs the tests. -->
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-engine</artifactId>
         <version>5.5.2</version>
         <scope>test</scope>
       </dependency>
+
+      <!-- Used to create fake versions of things so that testing can be made much simpler. -->
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
