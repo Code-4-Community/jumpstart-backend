@@ -12,9 +12,11 @@ import java.util.Set;
 
 /**
  * Our 'ServiceMain' for initializing the API server. Sets up routing and actually sets the server
- * to listen on some port (initially 8089).
+ * to listen on some port (initially 8081).
  */
 public class ApiMain {
+  public static final int defaultPort = 8081;
+
   public ApiMain() {}
 
   /** The initialize the sub-router and start the API server. */
@@ -65,7 +67,10 @@ public class ApiMain {
 
     // Start the server and listen on port :8081
     // (you can access this locally at http://localhost:8081)
-    server.requestHandler(router).listen(8081);
+    server.requestHandler(router).listen(defaultPort);
+
+    // Let the user know the server has started
+    System.out.println("Hey! The server has started on port " + defaultPort);
   }
 
   /**

@@ -29,11 +29,8 @@
 
   <!--
   Defines properties of the build.
-  We want the project to be built using Java 11, so that's set here.
   -->
   <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -81,6 +78,15 @@
     </pluginManagement>
     <!-- Plugins that will be used by the main pom. -->
     <plugins>
+      <plugin>
+        <!-- Maven's plugin for compiling code. We're using this to set the Java version to 11. -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+        <configuration>
+          <release>11</release>
+        </configuration>
+      </plugin>
       <plugin>
         <!-- Formatter, run with spotless:apply (check with spotless:check) to format your code. -->
         <groupId>com.diffplug.spotless</groupId>
