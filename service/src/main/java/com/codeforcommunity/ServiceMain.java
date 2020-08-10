@@ -1,5 +1,10 @@
 package com.codeforcommunity;
 
+import com.codeforcommunity.api.IPostsProcessor;
+import com.codeforcommunity.processors.PostsProcessor;
+import com.codeforcommunity.rest.IRouter;
+import com.codeforcommunity.rest.PostsRouter;
+
 /**
  * The main class for this application. Sets up and starts the API server, and is our entry point
  * into the program.
@@ -33,7 +38,9 @@ public class ServiceMain {
 
   /** Sets up values that are needed and starts the API server. */
   private void initializeServer() {
-    ApiMain apiMain = new ApiMain();
+    IPostsProcessor postsProcessor = new PostsProcessor();
+    IRouter postsRouter = new PostsRouter(postsProcessor);
+    ApiMain apiMain = new ApiMain(postsRouter);
     apiMain.startApi();
   }
 }

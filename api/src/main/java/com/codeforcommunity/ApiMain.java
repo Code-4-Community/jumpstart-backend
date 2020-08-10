@@ -22,8 +22,11 @@ import java.util.Set;
 public class ApiMain {
   /** The port that this application will start on. You can change this if you want! */
   public static final int defaultPort = 8081;
+  private final IRouter apiRouter;
 
-  public ApiMain() {}
+  public ApiMain(IRouter apiRouter) {
+    this.apiRouter = apiRouter;
+  }
 
   /** The initialize the sub-router and start the API server. */
   public void startApi() {
@@ -80,6 +83,9 @@ public class ApiMain {
      * - Functional Interfaces https://www.tutorialspoint.com/java8/java8_functional_interfaces.htm
      */
     home.handler(this::handleHome);
+
+    // Mount a sub-router for routes that look like "/posts/*"
+    router.mountSubRouter("/posts", apiRouter.initializeRouter(vertx));
 
     // Start the server and listen on port :8081
     // (you can access this locally at http://localhost:8081)
