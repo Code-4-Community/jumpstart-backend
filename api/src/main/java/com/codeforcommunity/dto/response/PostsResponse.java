@@ -2,6 +2,7 @@ package com.codeforcommunity.dto.response;
 
 import java.util.List;
 
+/** Another DTO (see {@link SinglePostResponse}) which contains a list of individual posts. */
 public class PostsResponse {
   private List<PostSummary> posts;
 

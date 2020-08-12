@@ -4,6 +4,7 @@ import static com.codeforcommunity.rest.IRouter.end;
 import static com.codeforcommunity.rest.RequestUtils.getRequestParameterAsInt;
 
 import com.codeforcommunity.api.IPostsProcessor;
+import com.codeforcommunity.dto.response.CommentsResponse;
 import com.codeforcommunity.dto.response.PostsResponse;
 import com.codeforcommunity.dto.response.SinglePostResponse;
 import io.vertx.core.Vertx;
@@ -38,6 +39,7 @@ public class PostsRouter implements IRouter {
   private void registerRoutes(Router router) {
     this.registerGetPostsRoute(router);
     this.registerGetSinglePostRoute(router);
+    this.registerGetCommentsForPostRoute(router);
   }
 
   /**
@@ -104,6 +106,36 @@ public class PostsRouter implements IRouter {
     }
     // Otherwise, return the found object.
     else {
+      end(ctx.response(), 200, JsonObject.mapFrom(response).encode());
+    }
+  }
+
+  /**
+   * Register the "/posts/:post_id/comments" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerGetCommentsForPostRoute(Router router) {
+    // Create a Route on the Router for the "/:post_id/comments" route.
+    Route route = router.get("/:post_id/comments");
+    route.handler(this::handleGetCommentsForPost);
+  }
+
+  /**
+   * Handle the "/posts/:post_id/comments" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handleGetCommentsForPost(RoutingContext ctx) {
+    // Call a helper method to get the "post_id" route param from the routing context.
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+
+    // Get the list of comments.
+    CommentsResponse response = processor.getCommentsForPost(postId);
+
+    if (response == null) {
+      end(ctx.response(), 404, "Post with ID " + postId + " not found");
+    } else {
       end(ctx.response(), 200, JsonObject.mapFrom(response).encode());
     }
   }
