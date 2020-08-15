@@ -1,5 +1,8 @@
 package com.codeforcommunity;
 
+import static com.codeforcommunity.rest.IRouter.end;
+
+import com.codeforcommunity.rest.IRouter;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
@@ -7,7 +10,9 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
+import io.vertx.ext.web.handler.LoggerHandler;
 import java.util.Set;
 
 /**
@@ -15,6 +20,7 @@ import java.util.Set;
  * to listen on some port (initially 8081).
  */
 public class ApiMain {
+  // The port that this application will start on. You can change this if you want!
   public static final int defaultPort = 8081;
 
   public ApiMain() {}
@@ -50,8 +56,19 @@ public class ApiMain {
                         "Access-Control-Allow-Headers",
                         "Access-Control-Request-Method")));
 
+    // Set a logger handler
+    router.route().handler(LoggerHandler.create());
+
+    // Set a body handler. This deals with gathering the entire body and sets it on the
+    // RoutingContext.
+    router.route().handler(BodyHandler.create(false));
+
+    // Set a custom method to be called on failure or uncaught exception.
+    router.route().failureHandler(this::handleFailure);
+
     // Create a route for the home (root) path
     Route home = router.route("/");
+
     /*
      * Set the handler method for the home path. Whenever the home path is loaded, the 'handleHome'
      * function is called.
@@ -62,7 +79,6 @@ public class ApiMain {
      * - Method References https://www.tutorialspoint.com/java8/java8_method_references.htm
      * - Functional Interfaces https://www.tutorialspoint.com/java8/java8_functional_interfaces.htm
      */
-
     home.handler(this::handleHome);
 
     // Start the server and listen on port :8081
@@ -75,7 +91,9 @@ public class ApiMain {
 
   /**
    * Handles evaluating the request provided in the {@link RoutingContext} and returning a response
-   * for the home route.
+   * for the home route. We could end this response using {@link IRouter}'s {@link
+   * IRouter#end(HttpServerResponse, int, String, String)}, but we'd like to show you what's going
+   * on under the hood here.
    *
    * @param ctx An object containing request data provided by a Vertx route handler.
    */
@@ -95,5 +113,21 @@ public class ApiMain {
 
     // Returns 'Hello Jumpstarters!' as a response
     response.end("Hello Jumpstarters!");
+  }
+
+  /**
+   * A method to handle possible failures in this router. This provides an example of us using
+   * {@link IRouter#end(HttpServerResponse, int, String, String)}.
+   *
+   * @param ctx The {@link RoutingContext} which contains the failure.
+   */
+  private void handleFailure(RoutingContext ctx) {
+    // Get the Throwable/Exception.
+    Throwable throwable = ctx.failure();
+
+    // Create the error message and return it.
+    String message = String.format("Internal server error caused by :%s", throwable.getMessage());
+    // Ends this response using the static end method in IRouter.
+    end(ctx.response(), 500, message);
   }
 }
