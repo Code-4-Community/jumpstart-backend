@@ -12,7 +12,8 @@ public interface RestFunctions {
   /**
    * Gets a specific route parameter as an int. This calls {@link
    * #getRequestParameterAsString(HttpServerRequest, String)} and attempts to convert the string
-   * value to an integer.
+   * value to an integer. In a path like {@code /posts/:post_id/comments}, this allows you to get
+   * the value of {@code :post_id} as a number.
    *
    * @param req The request object. Can be retrieved using {@code ctx.request()}.
    * @param name The name of the parameter.
@@ -33,7 +34,8 @@ public interface RestFunctions {
   }
 
   /**
-   * Gets a specific route parameter as a string.
+   * Gets a specific route parameter as a string. In a path like {@code /posts/:post_id/comments},
+   * this allows you to get the value of {@code :post_id} as a string.
    *
    * @param req The request object. Can be retrieved using {@code ctx.request()}.
    * @param name The name of the parameter.
@@ -54,7 +56,10 @@ public interface RestFunctions {
   /**
    * Gets a query parameter that may or may not be there as an optional of the desired type.
    * Attempts to map the query parameter from a string to an instance of the desired type. Returns
-   * an {@link Optional} which may or may not contain a value.
+   * an {@link Optional} which may or may not contain a value. In a path like
+   * {@code /posts/:post_id/comments?someValue=true}, this allows you to get the value(s) of
+   * {@code someValue}, and convert it to a different type using {@code mapper}, and then return it
+   * as an Optional.
    *
    * @param ctx The routing context to retrieve query param from.
    * @param name The name of the query param.
