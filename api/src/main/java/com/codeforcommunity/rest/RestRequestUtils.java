@@ -1,13 +1,53 @@
 package com.codeforcommunity.rest;
 
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.DecodeException;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 /** A helper interface for providing some functions for REST operations. */
-public interface RestFunctions {
+public interface RestRequestUtils {
+  /**
+   * Gets the JSON body from the given routing context, and unmarshals (puts) it into the given
+   * class. This will be used when you have a request body to convert to a DTO (POST, PUT, DELETE, ...).
+   *
+   * @throws IllegalStateException if the given request cannot be successfully mapped into the
+   *     given class or the provided body is null.
+   */
+  static <T> T getJsonBodyAsClass(RoutingContext ctx, Class<T> clazz) {
+    try {
+      // Get the body from the provided context as an Optional.
+      Optional<JsonObject> body = Optional.ofNullable(ctx.getBodyAsJson());
+      // Get the body if it exists and map it to the provided class. If it does not exist,
+      // then throw an IllegalArgumentException.
+      T value = body.orElseThrow(() -> new IllegalStateException("No body exists.")).mapTo(clazz);
+      return value;
+    } catch (DecodeException e) {
+      // Catch a DecodeException if there was an issue mapping to the given type, and rethrow as an
+      // IllegalArgumentException.
+      throw new IllegalStateException("Request could not be mapped into the given type.", e);
+    }
+  }
+
+  /**
+   * Get a request header from the provided request. For example, the {@code Content-Type} header's value.
+   *
+   * @param req The request to get the value from.
+   * @param name The name of the header you want a value for.
+   * @return The value of the given header name.
+   */
+  static String getRequestHeader(HttpServerRequest req, String name) {
+    // Get the header from the request.
+    String headerValue = req.getHeader(name);
+    // Return the value if it's not null or empty.
+    if (headerValue != null && !headerValue.isEmpty()) {
+      return headerValue;
+    }
+    throw new IllegalArgumentException("Requested header " + name + " does not exist.");
+  }
 
   /**
    * Gets a specific route parameter as an int. This calls {@link
