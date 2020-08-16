@@ -9,16 +9,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>api</artifactId>
+  <artifactId>persist</artifactId>
 
   <dependencies>
+    <!-- Database connector -->
     <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-web</artifactId>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
     </dependency>
     <!-- Mockito testing -->
     <dependency>
@@ -31,11 +28,6 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
-    </dependency>
-    <!-- Jackson Unmarshalling -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
     </dependency>
   </dependencies>
 </project>
