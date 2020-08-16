@@ -9,13 +9,14 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /** A helper interface for providing some functions for REST operations. */
-public interface RestRequestUtils {
+public interface RequestUtils {
   /**
    * Gets the JSON body from the given routing context, and unmarshals (puts) it into the given
-   * class. This will be used when you have a request body to convert to a DTO (POST, PUT, DELETE, ...).
+   * class. This will be used when you have a request body to convert to a DTO (POST, PUT, DELETE,
+   * ...).
    *
-   * @throws IllegalStateException if the given request cannot be successfully mapped into the
-   *     given class or the provided body is null.
+   * @throws IllegalStateException if the given request cannot be successfully mapped into the given
+   *     class or the provided body is null.
    */
   static <T> T getJsonBodyAsClass(RoutingContext ctx, Class<T> clazz) {
     try {
@@ -33,7 +34,8 @@ public interface RestRequestUtils {
   }
 
   /**
-   * Get a request header from the provided request. For example, the {@code Content-Type} header's value.
+   * Get a request header from the provided request. For example, the {@code Content-Type} header's
+   * value.
    *
    * @param req The request to get the value from.
    * @param name The name of the header you want a value for.
@@ -96,10 +98,10 @@ public interface RestRequestUtils {
   /**
    * Gets a query parameter that may or may not be there as an optional of the desired type.
    * Attempts to map the query parameter from a string to an instance of the desired type. Returns
-   * an {@link Optional} which may or may not contain a value. In a path like
-   * {@code /posts/:post_id/comments?someValue=true}, this allows you to get the value(s) of
-   * {@code someValue}, and convert it to a different type using {@code mapper}, and then return it
-   * as an Optional.
+   * an {@link Optional} which may or may not contain a value. In a path like {@code
+   * /posts/:post_id/comments?someValue=true}, this allows you to get the value(s) of {@code
+   * someValue}, and convert it to a different type using {@code mapper}, and then return it as an
+   * Optional.
    *
    * @param ctx The routing context to retrieve query param from.
    * @param name The name of the query param.
