@@ -1,11 +1,13 @@
 package com.codeforcommunity.database.tableImpl;
 
 import com.codeforcommunity.database.records.PostRecord;
+import com.codeforcommunity.database.seeder.Seeder;
 import com.codeforcommunity.database.table.IPostTable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Our implementation of the {@link IPostTable} in our database. This class will eventually be
@@ -71,7 +73,11 @@ public class StubPostTableImpl implements IPostTable {
 
   @Override
   public void savePost(PostRecord post) {
-    // Put (or replace) the post object by the given ID.
+    // Once we start using the database, these operations will be handled for us.
+    post.setId(this.getLastId() + 1);
+    post.setDateCreated(Seeder.getCurrentDateTime());
+    post.setClapCount(0);
+
     this.postMap.put(post.getId(), post);
   }
 
@@ -79,5 +85,16 @@ public class StubPostTableImpl implements IPostTable {
   public boolean postExists(int postId) {
     // See if a post with the given ID exists.
     return this.postMap.containsKey(postId);
+  }
+
+  /**
+   * Get the ID of the most recently inserted item. This is so that we can artificially assign a
+   * valid ID to the next item being inserted.
+   *
+   * @return An integer representing the most recent ID.
+   */
+  private int getLastId() {
+    Optional<Integer> maxId = this.postMap.keySet().stream().max(Integer::compareTo);
+    return maxId.orElse(-1);
   }
 }

@@ -30,6 +30,16 @@ public class PostRecord {
     this.commentCount = commentCount;
   }
 
+  public PostRecord(String author, String title, String body) {
+    this.id = null;
+    this.author = author;
+    this.dateCreated = null;
+    this.title = title;
+    this.clapCount = null;
+    this.body = body;
+    this.commentCount = null;
+  }
+
   public Integer getId() {
     return this.id;
   }
@@ -56,5 +66,21 @@ public class PostRecord {
 
   public Integer getCommentCount() {
     return commentCount;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public void setDateCreated(String dateCreated) {
+    this.dateCreated = dateCreated;
+  }
+
+  public void setClapCount(Integer clapCount) {
+    this.clapCount = clapCount;
+  }
+
+  public void setCommentCount(Integer commentCount) {
+    this.commentCount = commentCount;
   }
 }

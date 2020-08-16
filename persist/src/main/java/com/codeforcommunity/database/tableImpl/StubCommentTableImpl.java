@@ -1,10 +1,12 @@
 package com.codeforcommunity.database.tableImpl;
 
 import com.codeforcommunity.database.records.CommentRecord;
+import com.codeforcommunity.database.seeder.Seeder;
 import com.codeforcommunity.database.table.ICommentTable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Our implementation of the {@link ICommentTable} in our database. This class will eventually be
@@ -62,10 +64,28 @@ public class StubCommentTableImpl implements ICommentTable {
 
   @Override
   public void saveComment(CommentRecord comment) {
+    // Once we start using the database, these operations will be handled for us.
+    comment.setId(this.getLastId(comment.getPostId()) + 1);
+    comment.setDateCreated(Seeder.getCurrentDateTime());
+    comment.setClapCount(0);
+
     // Get the list of comments pertaining to the comment's post id. If empty, create a new list to
     // store comments in.
     commentMap.putIfAbsent(comment.getPostId(), new HashMap<>());
     // Add the given comment to our (possibly newly created) list.
     commentMap.get(comment.getPostId()).put(comment.getId(), comment);
+  }
+
+  /**
+   * Get the ID of the most recently inserted item. This is so that we can artificially assign a
+   * valid ID to the next item being inserted.
+   *
+   * @return An integer representing the most recent ID.
+   */
+  private int getLastId(int postId) {
+    Optional<Integer> maxId =
+        this.commentMap.getOrDefault(postId, new HashMap<>()).keySet().stream()
+            .max(Integer::compareTo);
+    return maxId.orElse(-1);
   }
 }

@@ -5,6 +5,7 @@ import com.codeforcommunity.database.records.CommentRecord;
 import com.codeforcommunity.database.records.PostRecord;
 import com.codeforcommunity.database.table.ICommentTable;
 import com.codeforcommunity.database.table.IPostTable;
+import com.codeforcommunity.dto.request.CreatePostRequest;
 import com.codeforcommunity.dto.response.Comment;
 import com.codeforcommunity.dto.response.CommentsResponse;
 import com.codeforcommunity.dto.response.PostSummary;
@@ -76,6 +77,11 @@ public class PostsProcessor implements IPostsProcessor {
     List<Comment> comments =
         commentRecords.stream().map(CommentMapper::recordToComment).collect(Collectors.toList());
     return new CommentsResponse(comments);
+  }
+
+  @Override
+  public void createPost(CreatePostRequest post) {
+    postTable.savePost(PostMapper.createRequestToRecord(post));
   }
 
   /**

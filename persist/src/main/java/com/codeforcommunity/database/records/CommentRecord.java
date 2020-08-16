@@ -27,6 +27,15 @@ public class CommentRecord {
     this.clapCount = clapCount;
   }
 
+  public CommentRecord(Integer postId, String author, String body) {
+    this.id = null;
+    this.postId = postId;
+    this.author = author;
+    this.body = body;
+    this.dateCreated = null;
+    this.clapCount = null;
+  }
+
   public Integer getId() {
     return this.id;
   }
@@ -49,5 +58,17 @@ public class CommentRecord {
 
   public String getBody() {
     return body;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public void setDateCreated(String dateCreated) {
+    this.dateCreated = dateCreated;
+  }
+
+  public void setClapCount(Integer clapCount) {
+    this.clapCount = clapCount;
   }
 }

@@ -41,34 +41,38 @@ public class Seeder {
 
     // Loop through and create stubPostCount amount of posts.
     for (int i = 0; i < postCount; i++) {
-      // Get the current date/time and format it.
-      String date = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm").format(LocalDateTime.now());
       // Get a length we'll want to use to select text.
       int textLength = random.nextInt(LOREM_IPSUM_TEXT.length());
       // Select a substring of textLength characters from the Lorem Ipsum text.
       String body = LOREM_IPSUM_TEXT.substring(0, textLength);
-      // Create a new post with the generated data from above and the number of comments we'll
-      // create below.
-      PostRecord post =
-          new PostRecord(
-              i, "Author " + i % 5, date, "Post #" + i, 0, body, STUB_POST_COUNT - i - 1);
+      // Create a new post with the generated data from above.
+      PostRecord post = new PostRecord("Author " + i % 5, "Post #" + i, body);
       postTable.savePost(post);
 
       // Generate comments for the post. For post 0, STUB_POST_COUNT comments will be generated.
       // For post STUB_POST_COUNT - 1 (the last post being generated), 0 comments will be generated.
       // This will give us a predictable comment count on each post for testing later on.
-      for (int j = 0; j < STUB_POST_COUNT - i - 1; j++) {
+      for (int j = 0; j < STUB_POST_COUNT - i; j++) {
         // Create comment length like we did for the post body length above.
         int commentLength = random.nextInt(LOREM_IPSUM_TEXT.length());
         // Get comment body like above.
         String commentBody = LOREM_IPSUM_TEXT.substring(0, commentLength);
         // Create the comment like above.
         CommentRecord comment =
-            new CommentRecord(
-                j, i, String.format("Comment Author %d%d", i, j), commentBody, date, 0);
+            new CommentRecord(i, String.format("Comment Author %d%d", i, j), commentBody);
         // Add the comment to our database.
         commentTable.saveComment(comment);
       }
     }
+  }
+
+  /**
+   * Create a random date/time in the form of a string.
+   *
+   * @return A date in the form of a string.
+   */
+  public static String getCurrentDateTime() {
+    // Get the current date/time and format it.
+    return DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm").format(LocalDateTime.now());
   }
 }

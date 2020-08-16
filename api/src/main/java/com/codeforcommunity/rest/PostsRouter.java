@@ -1,9 +1,11 @@
 package com.codeforcommunity.rest;
 
 import static com.codeforcommunity.rest.IRouter.end;
+import static com.codeforcommunity.rest.RequestUtils.getJsonBodyAsClass;
 import static com.codeforcommunity.rest.RequestUtils.getRequestParameterAsInt;
 
 import com.codeforcommunity.api.IPostsProcessor;
+import com.codeforcommunity.dto.request.CreatePostRequest;
 import com.codeforcommunity.dto.response.CommentsResponse;
 import com.codeforcommunity.dto.response.PostsResponse;
 import com.codeforcommunity.dto.response.SinglePostResponse;
@@ -30,6 +32,7 @@ public class PostsRouter implements IRouter {
     this.registerGetPostsRoute(router);
     this.registerGetSinglePostRoute(router);
     this.registerGetCommentsForPostRoute(router);
+    this.registerPostPostsRoute(router);
 
     return router;
   }
@@ -130,5 +133,35 @@ public class PostsRouter implements IRouter {
       // with a 404 NOT FOUND.
       end(ctx.response(), 404, e.getMessage());
     }
+  }
+
+  /**
+   * Register the POST "/posts" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerPostPostsRoute(Router router) {
+    Route route = router.post("/");
+    route.handler(this::handlePostPostsRoute);
+  }
+
+  /**
+   * Handle the POST "/posts" route
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handlePostPostsRoute(RoutingContext ctx) {
+    // Unmarshal the request body as a CreatePostRequest class.
+    CreatePostRequest createPostRequest = getJsonBodyAsClass(ctx, CreatePostRequest.class);
+    // Validate the DTO and ensure the provided info is valid.
+    if (!createPostRequest.validate()) {
+      end(ctx.response(), 400, "Create Post fields cannot be null.", "text/plain");
+      return;
+    }
+
+    // Create the post using the processor.
+    processor.createPost(createPostRequest);
+    // Return a success.
+    end(ctx.response(), 200);
   }
 }
