@@ -22,6 +22,7 @@ import java.util.Set;
 public class ApiMain {
   /** The port that this application will start on. You can change this if you want! */
   public static final int defaultPort = 8081;
+
   private final IRouter apiRouter;
 
   public ApiMain(IRouter apiRouter) {
@@ -133,6 +134,8 @@ public class ApiMain {
 
     // Create the error message and return it.
     String message = String.format("Internal server error caused by :%s", throwable.getMessage());
+    // Print the stack trace for debugging purposes.
+    throwable.printStackTrace();
     // Ends this response using the static end method in IRouter.
     end(ctx.response(), 500, message);
   }

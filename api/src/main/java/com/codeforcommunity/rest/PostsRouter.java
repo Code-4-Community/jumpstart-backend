@@ -14,7 +14,8 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
 public class PostsRouter implements IRouter {
-  private IPostsProcessor processor;
+  /** Our processor! */
+  private final IPostsProcessor processor;
 
   public PostsRouter(IPostsProcessor postsProcessor) {
     this.processor = postsProcessor;
@@ -25,21 +26,12 @@ public class PostsRouter implements IRouter {
     // Set a router object
     Router router = Router.router(vertx);
 
-    // Call a helper method to register this router's routes.
-    this.registerRoutes(router);
-
-    return router;
-  }
-
-  /**
-   * Register this {@link IRouter}'s routes with the {@link Router} object.
-   *
-   * @param router The Router to register the routes with.
-   */
-  private void registerRoutes(Router router) {
+    // Register this router's routes.
     this.registerGetPostsRoute(router);
     this.registerGetSinglePostRoute(router);
     this.registerGetCommentsForPostRoute(router);
+
+    return router;
   }
 
   /**
@@ -97,16 +89,14 @@ public class PostsRouter implements IRouter {
     // Call a helper method to get the "post_id" route param from the routing context.
     int postId = getRequestParameterAsInt(ctx.request(), "post_id");
 
-    // Get the specific post from the processor using the provided postId.
-    SinglePostResponse response = this.processor.getSinglePost(postId);
-
-    // Return a 404 NOT FOUND if post does not exist.
-    if (response == null) {
-      end(ctx.response(), 404, "Post with ID " + postId + " not found");
-    }
-    // Otherwise, return the found object.
-    else {
+    try {
+      // Get the specific post from the processor using the provided postId.
+      SinglePostResponse response = this.processor.getSinglePost(postId);
+      // Return the found object.
       end(ctx.response(), 200, JsonObject.mapFrom(response).encode());
+    } catch (IllegalArgumentException e) {
+      // Return a 404 NOT FOUND if post does not exist.
+      end(ctx.response(), 404, "Post with ID " + postId + " not found");
     }
   }
 
@@ -130,13 +120,15 @@ public class PostsRouter implements IRouter {
     // Call a helper method to get the "post_id" route param from the routing context.
     int postId = getRequestParameterAsInt(ctx.request(), "post_id");
 
-    // Get the list of comments.
-    CommentsResponse response = processor.getCommentsForPost(postId);
-
-    if (response == null) {
-      end(ctx.response(), 404, "Post with ID " + postId + " not found");
-    } else {
+    try {
+      // Get the list of comments.
+      CommentsResponse response = processor.getCommentsForPost(postId);
+      // Return the found comments.
       end(ctx.response(), 200, JsonObject.mapFrom(response).encode());
+    } catch (IllegalArgumentException e) {
+      // If an exception was thrown because there was no existing post with the given id, then end
+      // with a 404 NOT FOUND.
+      end(ctx.response(), 404, e.getMessage());
     }
   }
 }

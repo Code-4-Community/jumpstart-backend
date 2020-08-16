@@ -6,9 +6,9 @@ import java.util.List;
 public class PostsResponse {
   private List<PostSummary> posts;
 
-  private PostsResponse() {}
-
   public PostsResponse(List<PostSummary> posts) {
+    // Create a new list with the same exact comment objects. We want to do this so that if the
+    // original list is modified, our copy will stay the same.
     this.posts = List.copyOf(posts);
   }
 
