@@ -38,7 +38,8 @@ public interface ICommentTable {
   boolean commentExists(int postId, int commentId);
 
   /**
-   * Clap the given comment with the provided IDs if it exists.
+   * Clap the given comment with the provided IDs if it exists. This method assumes the comment
+   * exists.
    *
    * @param postId The ID of the post the comment belongs to.
    * @param commentId The ID of the comment to clap.
@@ -53,7 +54,8 @@ public interface ICommentTable {
   void deleteCommentsByPostId(int postId);
 
   /**
-   * Delete the comment related to the given IDs.
+   * Delete the comment related to the given IDs. This method assumes that the post exists and has
+   * comments.
    *
    * @param postId The ID of the post the comment belongs to.
    * @param commentId The ID of the comment to delete.

@@ -85,6 +85,11 @@ public class StubCommentTableImpl implements ICommentTable {
 
   @Override
   public void clapComment(int postId, int commentId) {
+    if (!this.commentExists(postId, commentId)) {
+      throw new IllegalArgumentException(
+          "No comment with ID " + commentId + " exists for post with ID " + postId);
+    }
+
     // Get the comments relating to the post.
     Map<Integer, CommentRecord> comments = commentMap.get(postId);
     // Find the comment with the given commentId.
@@ -99,6 +104,11 @@ public class StubCommentTableImpl implements ICommentTable {
 
   @Override
   public void deleteComment(int postId, int commentId) {
+    if (!this.commentExists(postId, commentId)) {
+      throw new IllegalArgumentException(
+          "No comment with ID " + commentId + " exists for post with ID " + postId);
+    }
+
     // Remove the comment from the list of comments related to the postId.
     commentMap.get(postId).remove(commentId);
   }

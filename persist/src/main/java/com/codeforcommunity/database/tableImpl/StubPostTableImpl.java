@@ -89,6 +89,10 @@ public class StubPostTableImpl implements IPostTable {
 
   @Override
   public void clapPost(int postId) {
+    if (!this.postExists(postId)) {
+      throw new IllegalArgumentException("No post with ID " + postId + " exists");
+    }
+
     PostRecord record = postMap.get(postId);
     record.setClapCount(record.getClapCount() + 1);
   }
@@ -96,7 +100,7 @@ public class StubPostTableImpl implements IPostTable {
   @Override
   public void deletePost(int postId) {
     if (!this.postExists(postId)) {
-      throw new IllegalArgumentException("No post with ID " + postId + "exists");
+      throw new IllegalArgumentException("No post with ID " + postId + " exists");
     }
 
     postMap.remove(postId);
