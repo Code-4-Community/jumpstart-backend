@@ -1,5 +1,6 @@
 package com.codeforcommunity.api;
 
+import com.codeforcommunity.dto.request.CreateCommentRequest;
 import com.codeforcommunity.dto.request.CreatePostRequest;
 import com.codeforcommunity.dto.response.CommentsResponse;
 import com.codeforcommunity.dto.response.PostsResponse;
@@ -45,4 +46,12 @@ public interface IPostsProcessor {
    * @param post The post to save.
    */
   void createPost(CreatePostRequest post);
+
+  /**
+   * Save the provided context to the database under the provided postId.
+   *
+   * @param postId The ID of the post the comment is under.
+   * @param comment The comment to save.
+   */
+  void createComment(int postId, CreateCommentRequest comment);
 }

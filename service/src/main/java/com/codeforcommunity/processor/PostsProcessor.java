@@ -5,6 +5,7 @@ import com.codeforcommunity.database.records.CommentRecord;
 import com.codeforcommunity.database.records.PostRecord;
 import com.codeforcommunity.database.table.ICommentTable;
 import com.codeforcommunity.database.table.IPostTable;
+import com.codeforcommunity.dto.request.CreateCommentRequest;
 import com.codeforcommunity.dto.request.CreatePostRequest;
 import com.codeforcommunity.dto.response.Comment;
 import com.codeforcommunity.dto.response.CommentsResponse;
@@ -82,6 +83,15 @@ public class PostsProcessor implements IPostsProcessor {
   @Override
   public void createPost(CreatePostRequest post) {
     postTable.savePost(PostMapper.createRequestToRecord(post));
+  }
+
+  @Override
+  public void createComment(int postId, CreateCommentRequest comment) {
+    if (!postTable.postExists(postId)) {
+      throw new IllegalArgumentException("Post with id " + postId + " does not exist.");
+    }
+
+    commentTable.saveComment(CommentMapper.createRequestToRecord(postId, comment));
   }
 
   /**

@@ -5,6 +5,7 @@ import static com.codeforcommunity.rest.RequestUtils.getJsonBodyAsClass;
 import static com.codeforcommunity.rest.RequestUtils.getRequestParameterAsInt;
 
 import com.codeforcommunity.api.IPostsProcessor;
+import com.codeforcommunity.dto.request.CreateCommentRequest;
 import com.codeforcommunity.dto.request.CreatePostRequest;
 import com.codeforcommunity.dto.response.CommentsResponse;
 import com.codeforcommunity.dto.response.PostsResponse;
@@ -33,6 +34,7 @@ public class PostsRouter implements IRouter {
     this.registerGetSinglePostRoute(router);
     this.registerGetCommentsForPostRoute(router);
     this.registerPostPostsRoute(router);
+    this.registerPostCommentsRoute(router);
 
     return router;
   }
@@ -146,7 +148,7 @@ public class PostsRouter implements IRouter {
   }
 
   /**
-   * Handle the POST "/posts" route
+   * Handle the POST "/posts" route.
    *
    * @param ctx The {@link RoutingContext} containing all relevant routing info.
    */
@@ -162,6 +164,36 @@ public class PostsRouter implements IRouter {
     // Create the post using the processor.
     processor.createPost(createPostRequest);
     // Return a success.
-    end(ctx.response(), 200);
+    end(ctx.response(), 200, "Post created.", "text/plain");
+  }
+
+  /**
+   * Register the POST "/posts/:post_id/comments" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerPostCommentsRoute(Router router) {
+    Route route = router.post("/:post_id/comments");
+    route.handler(this::handlePostCommentsRoute);
+  }
+
+  /**
+   * Handle the POST "/posts/:post_id/comments" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handlePostCommentsRoute(RoutingContext ctx) {
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+    CreateCommentRequest comment = getJsonBodyAsClass(ctx, CreateCommentRequest.class);
+    if (!comment.validate()) {
+      end(ctx.response(), 400, "Create Comment fields cannot be null.", "text/plain");
+    }
+
+    try {
+      processor.createComment(postId, comment);
+      end(ctx.response(), 200, "Comment created.", "text/plain");
+    } catch (IllegalArgumentException e) {
+      end(ctx.response(), 400, e.getMessage(), "text/plain");
+    }
   }
 }
