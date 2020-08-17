@@ -6,9 +6,9 @@ public class CreateCommentRequest {
   private String body;
 
   /**
-   * This private constructor is used by Vertx's {@link io.vertx.core.json.JsonObject} mapper to create
-   * an instance of this class and then unload each field of the JSON into this class. It's done using
-   * reflection, which is why the regular constructor we use isn't sufficient.
+   * This private constructor is used by Vertx's {@link io.vertx.core.json.JsonObject} mapper to
+   * create an instance of this class and then unload each field of the JSON into this class. It's
+   * done using reflection, which is why the regular constructor we use isn't sufficient.
    */
   private CreateCommentRequest() {}
 

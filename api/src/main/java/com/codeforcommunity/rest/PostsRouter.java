@@ -35,6 +35,8 @@ public class PostsRouter implements IRouter {
     this.registerGetCommentsForPostRoute(router);
     this.registerPostPostsRoute(router);
     this.registerPostCommentsRoute(router);
+    this.registerClapPostRoute(router);
+    this.registerClapCommentRoute(router);
 
     return router;
   }
@@ -101,7 +103,7 @@ public class PostsRouter implements IRouter {
       end(ctx.response(), 200, JsonObject.mapFrom(response).encode());
     } catch (IllegalArgumentException e) {
       // Return a 404 NOT FOUND if post does not exist.
-      end(ctx.response(), 404, "Post with ID " + postId + " not found");
+      end(ctx.response(), 404, e.getMessage(), "text/plain");
     }
   }
 
@@ -192,6 +194,59 @@ public class PostsRouter implements IRouter {
     try {
       processor.createComment(postId, comment);
       end(ctx.response(), 200, "Comment created.", "text/plain");
+    } catch (IllegalArgumentException e) {
+      end(ctx.response(), 400, e.getMessage(), "text/plain");
+    }
+  }
+
+  /**
+   * Register the POST "/posts/:post_id/clap" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerClapPostRoute(Router router) {
+    Route route = router.post("/:post_id/clap");
+    route.handler(this::handleClapPost);
+  }
+
+  /**
+   * Handle the POST "/posts/:post_id/clap" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handleClapPost(RoutingContext ctx) {
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+
+    try {
+      processor.clapPost(postId);
+      end(ctx.response(), 204);
+    } catch (IllegalArgumentException e) {
+      end(ctx.response(), 400, e.getMessage(), "text/plain");
+    }
+  }
+
+  /**
+   * Register the POST "/posts/:post_id/comments/:comment_id/clap" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerClapCommentRoute(Router router) {
+    Route route = router.post("/:post_id/comments/:comment_id/clap");
+    route.handler(this::handleClapComment);
+  }
+
+  /**
+   * Handle the POST "/posts/:post_id/comments/:comment_id/clap" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handleClapComment(RoutingContext ctx) {
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+    int commentId = getRequestParameterAsInt(ctx.request(), "comment_id");
+
+    try {
+      processor.clapComment(postId, commentId);
+      end(ctx.response(), 204);
     } catch (IllegalArgumentException e) {
       end(ctx.response(), 400, e.getMessage(), "text/plain");
     }

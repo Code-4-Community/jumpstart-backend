@@ -76,6 +76,22 @@ public class StubCommentTableImpl implements ICommentTable {
     commentMap.get(comment.getPostId()).put(comment.getId(), comment);
   }
 
+  @Override
+  public boolean commentExists(int postId, int commentId) {
+    // Determine if the given post has comments, and if so, determine if there are any with the
+    // given id.
+    return commentMap.containsKey(postId) && commentMap.get(postId).containsKey(commentId);
+  }
+
+  @Override
+  public void clapComment(int postId, int commentId) {
+    // Get the comments relating to the post.
+    Map<Integer, CommentRecord> comments = commentMap.get(postId);
+    // Find the comment with the given commentId.
+    CommentRecord record = comments.get(commentId);
+    record.setClapCount(record.getClapCount() + 1);
+  }
+
   /**
    * Get the ID of the most recently inserted item. This is so that we can artificially assign a
    * valid ID to the next item being inserted.

@@ -54,4 +54,19 @@ public interface IPostsProcessor {
    * @param comment The comment to save.
    */
   void createComment(int postId, CreateCommentRequest comment);
+
+  /**
+   * Increment the post's clap count by 1.
+   *
+   * @param postId The ID of the post to clap.
+   */
+  void clapPost(int postId);
+
+  /**
+   * Increment the comment's clap count by 1.
+   *
+   * @param postId The ID of the post to clap.
+   * @param commentId The ID of the comment to clap.
+   */
+  void clapComment(int postId, int commentId);
 }

@@ -87,6 +87,12 @@ public class StubPostTableImpl implements IPostTable {
     return this.postMap.containsKey(postId);
   }
 
+  @Override
+  public void clapPost(int postId) {
+    PostRecord record = postMap.get(postId);
+    record.setClapCount(record.getClapCount() + 1);
+  }
+
   /**
    * Get the ID of the most recently inserted item. This is so that we can artificially assign a
    * valid ID to the next item being inserted.

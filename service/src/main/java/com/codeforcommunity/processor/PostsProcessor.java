@@ -38,6 +38,17 @@ public class PostsProcessor implements IPostsProcessor {
     this.commentTable = commentTable;
   }
 
+  /**
+   * Determine if the post exists and throw an exception if it doesn't.
+   *
+   * @param postId The ID of the post to check.
+   */
+  private void checkPostExists(int postId) {
+    if (!postTable.postExists(postId)) {
+      throw new IllegalArgumentException("Post with id " + postId + " does not exist.");
+    }
+  }
+
   @Override
   public PostsResponse getPosts() {
     // Get the PostRecords.
@@ -55,10 +66,7 @@ public class PostsProcessor implements IPostsProcessor {
 
   @Override
   public SinglePostResponse getSinglePost(int postId) {
-    // Determine if the post exists and throw an exception if it doesn't.
-    if (!postTable.postExists(postId)) {
-      throw new IllegalArgumentException("Post with id " + postId + " does not exist.");
-    }
+    this.checkPostExists(postId);
 
     // Return the post with the given postId.
     PostRecord post = postTable.getById(postId);
@@ -67,10 +75,7 @@ public class PostsProcessor implements IPostsProcessor {
 
   @Override
   public CommentsResponse getCommentsForPost(int postId) {
-    // Determine if the post exists and throw an exception if it doesn't.
-    if (!postTable.postExists(postId)) {
-      throw new IllegalArgumentException("Post with id " + postId + " does not exist.");
-    }
+    this.checkPostExists(postId);
 
     // Get the comments belonging to the given postId. If none exist, an empty list is returned.
     List<CommentRecord> commentRecords = commentTable.getByPostId(postId);
@@ -87,11 +92,27 @@ public class PostsProcessor implements IPostsProcessor {
 
   @Override
   public void createComment(int postId, CreateCommentRequest comment) {
-    if (!postTable.postExists(postId)) {
-      throw new IllegalArgumentException("Post with id " + postId + " does not exist.");
-    }
+    this.checkPostExists(postId);
 
     commentTable.saveComment(CommentMapper.createRequestToRecord(postId, comment));
+  }
+
+  @Override
+  public void clapPost(int postId) {
+    this.checkPostExists(postId);
+
+    postTable.clapPost(postId);
+  }
+
+  @Override
+  public void clapComment(int postId, int commentId) {
+    this.checkPostExists(postId);
+
+    if (!commentTable.commentExists(postId, commentId)) {
+      throw new IllegalArgumentException("Comment with id " + commentId + " does not exist.");
+    }
+
+    commentTable.clapComment(postId, commentId);
   }
 
   /**

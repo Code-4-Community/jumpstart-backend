@@ -40,4 +40,11 @@ public interface IPostTable {
    * @return True if the post exists, false otherwise.
    */
   boolean postExists(int postId);
+
+  /**
+   * Increment the clap count for the given post.
+   *
+   * @param postId The ID of the post to clap.
+   */
+  void clapPost(int postId);
 }
