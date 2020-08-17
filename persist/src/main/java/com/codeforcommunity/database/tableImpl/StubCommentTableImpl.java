@@ -92,6 +92,17 @@ public class StubCommentTableImpl implements ICommentTable {
     record.setClapCount(record.getClapCount() + 1);
   }
 
+  @Override
+  public void deleteCommentsByPostId(int postId) {
+    commentMap.remove(postId);
+  }
+
+  @Override
+  public void deleteComment(int postId, int commentId) {
+    // Remove the comment from the list of comments related to the postId.
+    commentMap.get(postId).remove(commentId);
+  }
+
   /**
    * Get the ID of the most recently inserted item. This is so that we can artificially assign a
    * valid ID to the next item being inserted.

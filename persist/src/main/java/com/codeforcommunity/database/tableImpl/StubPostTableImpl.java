@@ -93,6 +93,15 @@ public class StubPostTableImpl implements IPostTable {
     record.setClapCount(record.getClapCount() + 1);
   }
 
+  @Override
+  public void deletePost(int postId) {
+    if (!this.postExists(postId)) {
+      throw new IllegalArgumentException("No post with ID " + postId + "exists");
+    }
+
+    postMap.remove(postId);
+  }
+
   /**
    * Get the ID of the most recently inserted item. This is so that we can artificially assign a
    * valid ID to the next item being inserted.

@@ -115,6 +115,28 @@ public class PostsProcessor implements IPostsProcessor {
     commentTable.clapComment(postId, commentId);
   }
 
+  @Override
+  public void deletePost(int postId) {
+    this.checkPostExists(postId);
+
+    // First delete all of the comments related to the post.
+    commentTable.deleteCommentsByPostId(postId);
+
+    // Then delete the post itself.
+    postTable.deletePost(postId);
+  }
+
+  @Override
+  public void deleteComment(int postId, int commentId) {
+    this.checkPostExists(postId);
+
+    if (!commentTable.commentExists(postId, commentId)) {
+      throw new IllegalArgumentException("Comment with id " + commentId + " does not exist.");
+    }
+
+    commentTable.deleteComment(postId, commentId);
+  }
+
   /**
    * Get a substring which is at most {@code previewMaxLength} length but possibly smaller.
    *

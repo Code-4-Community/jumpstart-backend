@@ -44,4 +44,19 @@ public interface ICommentTable {
    * @param commentId The ID of the comment to clap.
    */
   void clapComment(int postId, int commentId);
+
+  /**
+   * Delete all of the comments belonging to the given post.
+   *
+   * @param postId The ID of the post to delete comments for.
+   */
+  void deleteCommentsByPostId(int postId);
+
+  /**
+   * Delete the comment related to the given IDs.
+   *
+   * @param postId The ID of the post the comment belongs to.
+   * @param commentId The ID of the comment to delete.
+   */
+  void deleteComment(int postId, int commentId);
 }

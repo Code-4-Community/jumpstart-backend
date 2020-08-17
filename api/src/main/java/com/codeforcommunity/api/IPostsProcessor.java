@@ -69,4 +69,19 @@ public interface IPostsProcessor {
    * @param commentId The ID of the comment to clap.
    */
   void clapComment(int postId, int commentId);
+
+  /**
+   * Delete the post with the given ID.
+   *
+   * @param postId The ID of the post to delete.
+   */
+  void deletePost(int postId);
+
+  /**
+   * Delete the comment related to the given IDs.
+   *
+   * @param postId The ID of the post the comment belongs to.
+   * @param commentId The ID of the comment to delete.
+   */
+  void deleteComment(int postId, int commentId);
 }

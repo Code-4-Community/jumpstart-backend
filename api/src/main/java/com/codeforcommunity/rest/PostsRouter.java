@@ -37,6 +37,8 @@ public class PostsRouter implements IRouter {
     this.registerPostCommentsRoute(router);
     this.registerClapPostRoute(router);
     this.registerClapCommentRoute(router);
+    this.registerDeletePostRoute(router);
+    this.registerDeleteCommentRoute(router);
 
     return router;
   }
@@ -249,6 +251,59 @@ public class PostsRouter implements IRouter {
       end(ctx.response(), 204);
     } catch (IllegalArgumentException e) {
       end(ctx.response(), 400, e.getMessage(), "text/plain");
+    }
+  }
+
+  /**
+   * Register the DELETE "/posts/:post_id" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerDeletePostRoute(Router router) {
+    Route route = router.delete("/:post_id");
+    route.handler(this::handleDeletePostRoute);
+  }
+
+  /**
+   * Handle the DELETE "/posts/:post_id" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handleDeletePostRoute(RoutingContext ctx) {
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+
+    try {
+      processor.deletePost(postId);
+      end(ctx.response(), 204);
+    } catch (IllegalArgumentException e) {
+      end(ctx.response(), 404, e.getMessage(), "text/plain");
+    }
+  }
+
+  /**
+   * Register the DELETE "/posts/:post_id/comments/:comment_id" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerDeleteCommentRoute(Router router) {
+    Route route = router.delete("/:post_id/comments/:comment_id");
+    route.handler(this::handleDeleteCommentRoute);
+  }
+
+  /**
+   * Handle the DELETE "/posts/:post_id/comments/:comment_id" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handleDeleteCommentRoute(RoutingContext ctx) {
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+    int commentId = getRequestParameterAsInt(ctx.request(), "comment_id");
+
+    try {
+      processor.deleteComment(postId, commentId);
+      end(ctx.response(), 204);
+    } catch (IllegalArgumentException e) {
+      end(ctx.response(), 404, e.getMessage(), "text/plain");
     }
   }
 }

@@ -47,4 +47,11 @@ public interface IPostTable {
    * @param postId The ID of the post to clap.
    */
   void clapPost(int postId);
+
+  /**
+   * Delete the post by the given ID.
+   *
+   * @param postId The ID of the post to delete.
+   */
+  void deletePost(int postId);
 }
