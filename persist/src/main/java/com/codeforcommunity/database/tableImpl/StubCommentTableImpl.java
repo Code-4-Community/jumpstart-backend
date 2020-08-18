@@ -47,7 +47,7 @@ public class StubCommentTableImpl implements ICommentTable {
    *
    * @see StubPostTableImpl for a better {@link HashMap}/{@link Map} explanation.
    */
-  private final Map<Integer, Map<Integer, CommentRecord>> commentMap;
+  protected final Map<Integer, Map<Integer, CommentRecord>> commentMap;
 
   public StubCommentTableImpl() {
     this.commentMap = new HashMap<>();
