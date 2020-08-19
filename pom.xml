@@ -25,6 +25,7 @@
   <modules>
     <module>api</module>
     <module>service</module>
+    <module>persist</module>
   </modules>
 
   <!--
