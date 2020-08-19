@@ -20,14 +20,43 @@ public class PostsRouter implements IRouter {
   /** Our processor! */
   private final IPostsProcessor processor;
 
+  private Externals externs;
+
+  // This is how we'll return objects that we want to use in testing. Most of the time, this will
+  // be initialized using the default constructor (which just creates the default externals). But
+  // when testing, we can supply an extended externals, which can return values we can mock.
+  static class Externals {
+    public Router getRouter(Vertx vertx) {
+      return Router.router(vertx);
+    }
+  }
+
+  /**
+   * The constructor you'll use most of the time.
+   *
+   * @param postsProcessor The processor.
+   */
   public PostsRouter(IPostsProcessor postsProcessor) {
+    this.externs = new Externals();
+    this.processor = postsProcessor;
+  }
+
+  /**
+   * The constructor we'll use when testing. It allows us to override the Externals.
+   *
+   * @param postsProcessor The processor.
+   * @param externsOverride The overridden externals. This should *not* be the default one.
+   */
+  PostsRouter(IPostsProcessor postsProcessor, Externals externsOverride) {
+    this.externs = externsOverride;
     this.processor = postsProcessor;
   }
 
   @Override
   public Router initializeRouter(Vertx vertx) {
-    // Set a router object
-    Router router = Router.router(vertx);
+    // Set a router object. We'll now be getting this from the externs so that we can test using a
+    // mocked router.
+    Router router = this.externs.getRouter(vertx);
 
     // Register this router's routes.
     this.registerGetPostsRoute(router);

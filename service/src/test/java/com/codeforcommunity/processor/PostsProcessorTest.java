@@ -4,7 +4,6 @@ import static com.codeforcommunity.database.seeder.Seeder.STUB_POST_COUNT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -20,7 +19,6 @@ import com.codeforcommunity.dto.response.CommentsResponse;
 import com.codeforcommunity.dto.response.PostSummary;
 import com.codeforcommunity.dto.response.PostsResponse;
 import com.codeforcommunity.dto.response.SinglePostResponse;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -105,9 +103,15 @@ public class PostsProcessorTest {
     }
   }
 
-  // Write a test which runs multiple times with different inputs.
+  // Write a test which runs multiple times with different inputs. The actual input values are
+  // decided by annotations that follow (e.g. the @ValueSource, @NullSource, and @EmptySource
+  // annotations).
   @ParameterizedTest
+  // ValueSource passes in the values contained in the curly braces during each run of the
+  // parameterized test. The name of the list needs to be one of the following: 'doubles' for
+  // double types, 'ints' for integer types, 'longs' for long types, and 'strings' for string types.
   @ValueSource(ints = {1, 2, 5, 14})
+  // Since this is a ParameterizedTest, it can take in an argument to the method.
   public void testGetSinglePost(int postId) {
     // Make sure that getting a single post returns a post with that ID.
     SinglePostResponse post = processor.getSinglePost(postId);
@@ -115,18 +119,20 @@ public class PostsProcessorTest {
   }
 
   @ParameterizedTest
+  // This method tests if an exception is thrown when invalid post IDs are passed in. Since we set
+  // up our database to have posts with IDs from 0 to STUB_POST_COUNT, we'll just get numbers
+  // outside that range like -1 and STUB_POST_COUNT + 1.
   @ValueSource(ints = {-1, STUB_POST_COUNT + 1})
   public void testGetSinglePostInvalidPostId(int postId) {
-    // Try to get a post whose ID does not exist. We're checking exceptions like this because
+    // Try to get a post whose ID exists. We're checking exceptions like this because
     // the try/catch method allows us to check things about the thrown exception.
     try {
       processor.getSinglePost(postId);
       // Fail this test if an exception isn't thrown.
       fail("A non-existent post was able to be retrieved.");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // Check that the message is what we expect.
-      String message = "Post with id " + postId + " does not exist.";
+      String message = "No post with id " + postId + " exists.";
       assertEquals(message, e.getMessage());
       // Make sure the number of posts stayed the same.
       assertEquals(STUB_POST_COUNT, postTable.getUnderlyingDb().size());
@@ -140,11 +146,10 @@ public class PostsProcessorTest {
     try {
       processor.getCommentsForPost(postId);
       // Fail if an exception isn't thrown.
-      fail("Comments were able to be retrieved for a post that does not exist.");
-    }
-    catch (IllegalArgumentException e) {
+      fail("Comments were able to be retrieved for a post that exists.");
+    } catch (IllegalArgumentException e) {
       // Check the exception message.
-      String message = "Post with id " + postId + " does not exist.";
+      String message = "No post with id " + postId + " exists.";
       assertEquals(message, e.getMessage());
     }
   }
@@ -195,10 +200,9 @@ public class PostsProcessorTest {
       // Try to add a comment to an invalid post.
       processor.createComment(postId, newComment);
       fail("A comment was able to be created for an invalid post.");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // Check the exception message.
-      String message = "Post with id " + postId + " does not exist.";
+      String message = "No post with id " + postId + " exists.";
       assertEquals(message, e.getMessage());
     }
   }
@@ -220,13 +224,12 @@ public class PostsProcessorTest {
   @ValueSource(ints = {-1, STUB_POST_COUNT + 1})
   public void testClapInvalidPost(int postId) {
     try {
-      // Try to add a comment to an invalid post.
+      // Try to add a clap to an invalid post.
       processor.clapPost(postId);
       fail("A non-existent comment was able to be clapped.");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // Check the exception message.
-      String message = "Post with id " + postId + " does not exist.";
+      String message = "No post with id " + postId + " exists.";
       assertEquals(message, e.getMessage());
     }
   }
@@ -257,10 +260,9 @@ public class PostsProcessorTest {
       // Try to add a comment to an invalid post.
       processor.clapComment(postId, 0);
       fail("A comment was able to be clapped on a non-existent post.");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // Check the exception message.
-      String message = "Post with id " + postId + " does not exist.";
+      String message = "No post with id " + postId + " exists.";
       assertEquals(message, e.getMessage());
     }
   }
@@ -272,10 +274,9 @@ public class PostsProcessorTest {
       // Try to add a comment to an invalid post.
       processor.clapComment(0, commentId);
       fail("A non-existent comment was able to be clapped.");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // Check the exception message.
-      String message = "Comment with id " + commentId + " does not exist.";
+      String message = "No comment with post id 0 and comment id " + commentId + " exists.";
       assertEquals(message, e.getMessage());
     }
   }
@@ -292,10 +293,9 @@ public class PostsProcessorTest {
       // Try to get the post again.
       processor.getSinglePost(1);
       fail("A post was successfully retrieved when it should have been deleted.");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // Check the exception message.
-      String message = "Post with id 1 does not exist.";
+      String message = "No post with id 1 exists.";
       assertEquals(message, e.getMessage());
       // Make sure the count of posts has been decreased by 1.
       assertEquals(STUB_POST_COUNT - 1, postTable.getUnderlyingDb().size());
@@ -311,10 +311,9 @@ public class PostsProcessorTest {
       // Try to delete an invalid post.
       processor.deletePost(postId);
       fail("A non-existent post was able to be deleted.");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // Check the exception message.
-      String message = "Post with id " + postId + " does not exist.";
+      String message = "No post with id " + postId + " exists.";
       assertEquals(message, e.getMessage());
     }
   }
@@ -348,10 +347,9 @@ public class PostsProcessorTest {
       // Try to delete an invalid post.
       processor.deleteComment(postId, 0);
       fail("A non-existent comment was able to be deleted.");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // Check the exception message.
-      String message = "Post with id " + postId + " does not exist.";
+      String message = "No post with id " + postId + " exists.";
       assertEquals(message, e.getMessage());
     }
   }
@@ -363,10 +361,9 @@ public class PostsProcessorTest {
       // Try to delete an invalid comment.
       processor.deleteComment(0, commentId);
       fail("A non-existent post was able to be deleted.");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       // Check the exception message.
-      String message = "Comment with id " + commentId + " does not exist.";
+      String message = "No comment with post id 0 and comment id " + commentId + " exists.";
       assertEquals(message, e.getMessage());
     }
   }
