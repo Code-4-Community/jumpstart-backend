@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-/** A helper interface for providing some functions for REST operations. */
-public interface RequestUtils {
+/** A helper class for providing some functions for REST operations. */
+public class RequestUtils {
   /**
    * Gets the JSON body from the given routing context, and unmarshals (puts) it into the given
    * class. This will be used when you have a request body to convert to a DTO (POST, PUT, DELETE,
@@ -18,7 +18,7 @@ public interface RequestUtils {
    * @throws IllegalStateException if the given request cannot be successfully mapped into the given
    *     class or the provided body is null.
    */
-  static <T> T getJsonBodyAsClass(RoutingContext ctx, Class<T> clazz) {
+  public static <T> T getJsonBodyAsClass(RoutingContext ctx, Class<T> clazz) {
     try {
       // Get the body from the provided context as an Optional.
       Optional<JsonObject> body = Optional.ofNullable(ctx.getBodyAsJson());
@@ -41,7 +41,7 @@ public interface RequestUtils {
    * @param name The name of the header you want a value for.
    * @return The value of the given header name.
    */
-  static String getRequestHeader(HttpServerRequest req, String name) {
+  public static String getRequestHeader(HttpServerRequest req, String name) {
     // Get the header from the request.
     String headerValue = req.getHeader(name);
     // Return the value if it's not null or empty.
@@ -62,7 +62,7 @@ public interface RequestUtils {
    * @return An integer representing the value. Will throw an exception if the value is null or no
    *     value exists.
    */
-  static int getRequestParameterAsInt(HttpServerRequest req, String name) {
+  public static int getRequestParameterAsInt(HttpServerRequest req, String name) {
     // Get the parameter value as a string.
     String paramValue = getRequestParameterAsString(req, name);
     try {
@@ -84,7 +84,7 @@ public interface RequestUtils {
    * @return A string representing the value. Will throw an exception if the value is null or no
    *     value exists.
    */
-  static String getRequestParameterAsString(HttpServerRequest req, String name) {
+  public static String getRequestParameterAsString(HttpServerRequest req, String name) {
     // Get the specific param value as a string.
     String paramValue = req.getParam(name);
     // Return the value if the it is non-null and present.
@@ -110,7 +110,7 @@ public interface RequestUtils {
    * @param <T> The desired type.
    * @return An optional object of the query param as it's desired type.
    */
-  static <T> Optional<T> getOptionalQueryParam(
+  public static <T> Optional<T> getOptionalQueryParam(
       RoutingContext ctx, String name, Function<List<String>, T> mapper) {
     // Gets a list of strings for the possible query parameter.
     List<String> params = ctx.queryParam(name);
