@@ -14,13 +14,7 @@ public class PostRecord {
   private Integer commentCount;
 
   public PostRecord(
-      Integer id,
-      String author,
-      String dateCreated,
-      String title,
-      Integer clapCount,
-      String body,
-      Integer commentCount) {
+      Integer id, String author, String dateCreated, String title, Integer clapCount, String body) {
     this.id = id;
     this.author = author;
     this.dateCreated = dateCreated;

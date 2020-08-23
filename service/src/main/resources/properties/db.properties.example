@@ -1,0 +1,17 @@
+# This is our properties example file. We have this here so that YOU CAN COPY IT and fill in
+# properties you don't want to actually commit to the repo. So the program will end up reading the
+# copied and filled in db.properties file, but you'll get the basic structure for that from
+# db.properties.example. We also don't want to hard-code these values in the program, since it may
+# be different on other systems, and it's a lot simpler to keep changeable values like these
+# in one place.
+
+# This is the database url. If you named your database something other than 'jumpstart', replace
+# that in the db.properties file.
+database.url = jdbc:postgresql://localhost:5432/jumpstart?autoreconnect=true
+
+# Unless you created a new database user, this will probably stay the same.
+database.username = postgres
+
+# We don't know what your password is, so fill it in here. Also, if you're getting an authentication
+# error, watch for trailing whitespace in the password here.
+database.password = <your db password here>

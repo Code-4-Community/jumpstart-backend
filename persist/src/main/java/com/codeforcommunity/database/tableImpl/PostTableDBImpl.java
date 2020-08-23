@@ -42,8 +42,7 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
         time,
         res.getString("title"),
         res.getInt("clap_count"),
-        res.getString("body"),
-        0);
+        res.getString("body"));
   }
 
   @Override

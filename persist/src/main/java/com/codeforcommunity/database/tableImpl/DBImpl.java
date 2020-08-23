@@ -11,7 +11,8 @@ import java.util.Properties;
 
 /**
  * Our DBImpl class which {@link PostTableDBImpl} and {@link CommentTableDBImpl} will extend from.
- * This is here to provide a few common functions that will be used.
+ * This is here to provide a few common functions that will be used. It has package-default
+ * visibility Since only the DBImpls will need to know about it.
  */
 abstract class DBImpl {
   private final String url;
@@ -27,18 +28,18 @@ abstract class DBImpl {
   public DBImpl(Properties dbProperties) {
     // Get the url, user, and password values from the provided properties object and make sure
     // they're not null.
-    this.url = dbProperties.getProperty("url");
-    this.user = dbProperties.getProperty("user");
-    this.password = dbProperties.getProperty("password");
+    this.url = dbProperties.getProperty("database.url");
+    this.user = dbProperties.getProperty("database.username");
+    this.password = dbProperties.getProperty("database.password");
 
     // Make sure nothing is null, otherwise this will cause issues when connecting.
-    if (url == null) {
+    if (this.url == null) {
       throw new IllegalArgumentException("Database URL cannot be null.");
     }
-    if (user == null) {
+    if (this.user == null) {
       throw new IllegalArgumentException("Database user cannot be null.");
     }
-    if (password == null) {
+    if (this.password == null) {
       throw new IllegalArgumentException("Database password cannot be null");
     }
   }
