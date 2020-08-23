@@ -1,7 +1,7 @@
 package com.codeforcommunity.database.tableImpl;
 
-import com.codeforcommunity.database.records.PostRecord;
-import com.codeforcommunity.database.table.IPostTable;
+import com.codeforcommunity.database.records.CommentRecord;
+import com.codeforcommunity.database.table.ICommentTable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,56 +10,55 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class PostTableDBImpl extends DBImpl implements IPostTable {
+public class CommentTableDBImpl extends DBImpl implements ICommentTable {
   /**
    * The constructor which just calls the {@link DBImpl} super constructor.
    *
    * @param dbProperties A {@link Properties} we expect to contain the values for url, user, and
    *     password for connecting to the database.
    */
-  public PostTableDBImpl(Properties dbProperties) {
+  public CommentTableDBImpl(Properties dbProperties) {
     super(dbProperties);
   }
 
   /**
-   * Converts a selection using the {@code SELECT *} statement to a {@link PostRecord}.
+   * Converts a selection using the {@code SELECT *} statement to a {@link CommentRecord}.
    *
    * @param res The current {@link ResultSet} row to pull data from.
-   * @return A PostRecord containing the row's data.
+   * @return A CommentRecord containing the row's data.
    * @throws SQLException If there is an issue getting data from the row. This could be because
    *     there is no current row, you're trying to get data from a column that doesn't exist, you're
    *     trying to convert to the wrong type, or other reasons.
    */
-  private static PostRecord allFieldsResultSetToRecord(ResultSet res) throws SQLException {
+  private static CommentRecord allFieldsResultSetToRecord(ResultSet res) throws SQLException {
     // Convert the timestamp to a human-readable string.
     String time = timestampToString(res.getTimestamp("date_created"));
     // Return a new PostRecord with the found data. You can either get the column by the index
     // (so if we said 'SELECT id, author, ...', id would be index 1, author 2, ...) or by column
     // name.
-    return new PostRecord(
+    return new CommentRecord(
         res.getInt("id"),
+        res.getInt("post_id"),
         res.getString("author"),
-        time,
-        res.getString("title"),
-        res.getInt("clap_count"),
         res.getString("body"),
-        0);
+        time,
+        res.getInt("clap_count"));
   }
 
   @Override
-  public PostRecord getById(int id) {
-    PostRecord record = null;
+  public List<CommentRecord> getByPostId(int postId) {
+    List<CommentRecord> comments = new ArrayList<>();
     try {
       // Get our database connection.
       Connection conn = getConnection();
       // Create our SQL string. This one gets all of the fields of a Post by a given ID.
       // The '?' allows us to safely insert that variable into the query without having to worry
       // about escaping any special characters inside.
-      String sql = "SELECT * FROM posts WHERE id = ?;";
+      String sql = "SELECT * FROM comments WHERE post_id = ?;";
       // A PreparedStatement is the technique that allows us to insert variables by '?'.
       PreparedStatement stmt = conn.prepareStatement(sql);
       // Set the first '?' = id. Note how in prepared statements, parameters are not 0-indexed.
-      stmt.setInt(1, id);
+      stmt.setInt(1, postId);
 
       // Get our results. This could also be done in two separate calls;
       // stmt.execute() and stmt.getResultSet().
@@ -67,8 +66,8 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
       // The next row in the table is queued up by calling ResultSet.next(). If ResultSet.next()
       // returns false, then there are no more rows (or no rows were found if
       // this is the first call).
-      if (res.next()) {
-        record = allFieldsResultSetToRecord(res);
+      while (res.next()) {
+        comments.add(allFieldsResultSetToRecord(res));
       }
 
       res.close();
@@ -77,47 +76,40 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
     } catch (SQLException e) {
       throw new IllegalStateException("There was an issue interacting with the database.", e);
     }
-    if (record == null) {
-      throw new IllegalArgumentException("No post with ID " + id + " exists.");
-    }
-    return record;
+    return comments;
   }
 
   @Override
-  public List<PostRecord> getAllPosts() {
-    List<PostRecord> posts = new ArrayList<>();
+  public void saveComment(CommentRecord comment) {
     try {
       Connection conn = getConnection();
-      String sql = "SELECT * FROM posts;";
+      String sql = "INSERT INTO comments (post_id, author, body) VALUES (?, ?, ?);";
+
       PreparedStatement stmt = conn.prepareStatement(sql);
-      ResultSet res = stmt.executeQuery();
+      stmt.setInt(1, comment.getPostId());
+      stmt.setString(2, comment.getAuthor());
+      stmt.setString(3, comment.getBody());
 
-      // Since ResultSet.next() queues up the next row and lets you know if there are any left,
-      // we just iterate through the found records like this.
-      while (res.next()) {
-        posts.add(allFieldsResultSetToRecord(res));
-      }
+      stmt.execute();
 
-      res.close();
       stmt.close();
       conn.close();
     } catch (SQLException e) {
       throw new IllegalStateException("There was an issue interacting with the database.", e);
     }
-
-    return posts;
   }
 
   @Override
-  public boolean postExists(int postId) {
+  public boolean commentExists(int postId, int commentId) {
     boolean commentExists = false;
     try {
       Connection conn = getConnection();
-      // In this case, we don't want to select all fields because getting a larger number
-      // of fields is a slower operation.
-      String sql = "SELECT id FROM posts WHERE id = ?;";
+      String sql = "SELECT id FROM comments WHERE post_id = ? AND id = ?;";
+
       PreparedStatement stmt = conn.prepareStatement(sql);
       stmt.setInt(1, postId);
+      stmt.setInt(2, commentId);
+
       ResultSet res = stmt.executeQuery();
       if (res.next()) {
         commentExists = true;
@@ -133,33 +125,29 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
   }
 
   @Override
-  public void savePost(PostRecord post) {
-    try {
-      Connection conn = getConnection();
-      // We're setting ONLY the author, title, and body since the database will provide for us the
-      // id, date_created, and clap_count automatically.
-      String sql = "INSERT INTO posts (author, title, body) VALUES (?, ?, ?);";
-      PreparedStatement stmt = conn.prepareStatement(sql);
-      stmt.setString(1, post.getAuthor());
-      stmt.setString(2, post.getTitle());
-      stmt.setString(3, post.getBody());
-
-      stmt.execute();
-
-      stmt.close();
-      conn.close();
-    } catch (SQLException e) {
-      throw new IllegalStateException("There was an issue interacting with the database.", e);
-    }
-  }
-
-  @Override
-  public void clapPost(int postId) {
+  public void clapComment(int postId, int commentId) {
     try {
       Connection conn = getConnection();
       // Here, we're updating the rows in the post table by the given id
       // by incrementing the clap count.
-      String sql = "UPDATE posts SET clap_count = clap_count + 1 WHERE id = ?;";
+      String sql = "UPDATE comments SET clap_count = clap_count + 1 WHERE post_id = ? AND id = ?;";
+      PreparedStatement stmt = conn.prepareStatement(sql);
+      stmt.setInt(1, postId);
+      stmt.setInt(2, commentId);
+      stmt.execute();
+
+      stmt.close();
+      conn.close();
+    } catch (SQLException e) {
+      throw new IllegalStateException("There was an issue interacting with the database.", e);
+    }
+  }
+
+  @Override
+  public void deleteCommentsByPostId(int postId) {
+    try {
+      Connection conn = getConnection();
+      String sql = "DELETE FROM comments WHERE post_id = ?;";
       PreparedStatement stmt = conn.prepareStatement(sql);
       stmt.setInt(1, postId);
       stmt.execute();
@@ -172,12 +160,13 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
   }
 
   @Override
-  public void deletePost(int postId) {
+  public void deleteComment(int postId, int commentId) {
     try {
       Connection conn = getConnection();
-      String sql = "DELETE FROM posts WHERE id = ?;";
+      String sql = "DELETE FROM comments WHERE post_id = ? AND id = ?;";
       PreparedStatement stmt = conn.prepareStatement(sql);
       stmt.setInt(1, postId);
+      stmt.setInt(2, commentId);
       stmt.execute();
 
       stmt.close();
@@ -185,5 +174,30 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
     } catch (SQLException e) {
       throw new IllegalStateException("There was an issue interacting with the database.", e);
     }
+  }
+
+  @Override
+  public int getCommentCountForPost(int postId) {
+    int count = 0;
+    try {
+      Connection conn = getConnection();
+      String sql = "SELECT COUNT(*) FROM comments WHERE post_id = ?;";
+      PreparedStatement stmt = conn.prepareStatement(sql);
+      stmt.setInt(1, postId);
+
+      ResultSet res = stmt.executeQuery();
+      if (res.next()) {
+        count = res.getInt(1);
+      } else {
+        throw new IllegalArgumentException("No post with id " + postId + " exists.");
+      }
+
+      res.close();
+      stmt.close();
+      conn.close();
+    } catch (SQLException e) {
+      throw new IllegalStateException("There was an issue interacting with the database.", e);
+    }
+    return count;
   }
 }
