@@ -41,6 +41,8 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
         res.getString("author"),
         time,
         res.getString("title"),
+        // Null is returned for clap_count if there is no post_claps record during the join. The
+        // getInt method turns null into a 0, since 'int' data types cannot be null.
         res.getInt("clap_count"),
         res.getString("body"));
   }
@@ -54,7 +56,14 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
       // Create our SQL string. This one gets all of the fields of a Post by a given ID.
       // The '?' allows us to safely insert that variable into the query without having to worry
       // about escaping any special characters inside.
-      String sql = "SELECT * FROM posts WHERE id = ?;";
+      // We're using a LEFT JOIN instead of just a JOIN here since we want post information to be
+      // returned even if clap information doesn't exist.
+      String sql =
+          "SELECT posts.*, clap_count "
+              + "FROM posts "
+              + "LEFT JOIN (SELECT post_id, COUNT(*) AS clap_count FROM post_claps GROUP BY post_id) claps "
+              + "ON posts.id = claps.post_id "
+              + "WHERE posts.id = ?;";
       // A PreparedStatement is the technique that allows us to insert variables by '?'.
       PreparedStatement stmt = conn.prepareStatement(sql);
       // Set the first '?' = id. Note how in prepared statements, parameters are not 0-indexed.
@@ -87,7 +96,11 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
     List<PostRecord> posts = new ArrayList<>();
     try {
       Connection conn = getConnection();
-      String sql = "SELECT * FROM posts;";
+      String sql =
+          "SELECT posts.*, clap_count "
+              + "FROM posts "
+              + "LEFT JOIN (SELECT post_id, COUNT(*) AS clap_count FROM post_claps GROUP BY post_id) claps "
+              + "ON posts.id = claps.post_id;";
       PreparedStatement stmt = conn.prepareStatement(sql);
       ResultSet res = stmt.executeQuery();
 
@@ -114,7 +127,12 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
       Connection conn = getConnection();
       // In this case, we don't want to select all fields because getting a larger number
       // of fields is a slower operation.
-      String sql = "SELECT id FROM posts WHERE id = ?;";
+      String sql =
+          "SELECT id "
+              + "FROM posts "
+              + "LEFT JOIN (SELECT post_id, COUNT(*) AS clap_count FROM post_claps GROUP BY post_id) claps "
+              + "ON posts.id = claps.post_id "
+              + "WHERE id = ?;";
       PreparedStatement stmt = conn.prepareStatement(sql);
       stmt.setInt(1, postId);
       ResultSet res = stmt.executeQuery();
@@ -158,7 +176,7 @@ public class PostTableDBImpl extends DBImpl implements IPostTable {
       Connection conn = getConnection();
       // Here, we're updating the rows in the post table by the given id
       // by incrementing the clap count.
-      String sql = "UPDATE posts SET clap_count = clap_count + 1 WHERE id = ?;";
+      String sql = "INSERT INTO post_claps (post_id) VALUES (?);";
       PreparedStatement stmt = conn.prepareStatement(sql);
       stmt.setInt(1, postId);
       stmt.execute();
