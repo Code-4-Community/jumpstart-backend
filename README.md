@@ -36,6 +36,10 @@ installing some of these):
   we provide may be IntelliJ specific. For most of them, the workarounds will
   be pretty trivial though.
   - The full version is free if you're a student!
+- [ ] [PostgreSQL and PGAdmin](https://www.postgresql.org/download/)
+  - We'd recommend using a version >10 (we're using v12)
+  - We recommend doing it by the "Interactive installer by EDB" if you're on Mac or Windows
+    - Just step through the installer and make sure you get both `PostgreSQL Server` and `pgAdmin 4`
   
 ### Configurations
 - [ ] Make sure your JAVA_HOME is set correctly
@@ -46,7 +50,7 @@ installing some of these):
   [Mac/Linux](https://maven.apache.org/install.html#unix-based-operating-system-linux-solaris-and-mac-os-x-tips)
   - Once you do that, restart your terminal (and your text editor if you were using
   that as your terminal), and run `mvn --version`. Make sure the Java version is 11.
-- [ ] If you're on Windows, we're going to set your terminal to use *Git Bash*
+- [ ] If you're on Windows, we're going to set your in-IntelliJ terminal to use *Git Bash*
 Instead of the command prompt (working with bash is more pleasant in our opinion.
 also, a lot of commands carry over, and it should be easy to figure out the equivalent from Google.)
   - Go to `File > Settings > Tools > Terminal` and replace your shell path with
@@ -110,6 +114,7 @@ since it's pretty simple (and the debugger is really nice), but you can use whic
 3. Wait until a message letting you know the server has been started in the console
 4. Congrats! You have a working server!
 5. Press `ctrl + c` when you're done
+    - P.S. `ctrl + c` is for both Windows *and* Mac
 
 ## A Quick Test
 To run a quick test to show that your program is working. Run the following command in a new terminal window
