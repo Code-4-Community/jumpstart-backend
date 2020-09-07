@@ -53,10 +53,17 @@ public class PostsProcessor implements IPostsProcessor {
   public PostsResponse getPosts() {
     // Get the PostRecords.
     List<PostRecord> posts = postTable.getAllPosts();
+
+    // Loop through and set the comment counts for each post.
+    for (PostRecord record : posts) {
+      record.setCommentCount(commentTable.getCommentCountForPost(record.getId()));
+    }
+
     // Turn the list into a stream, and map each PostRecord into a PostSummary using the PostMapper
     // interface that was created. After that, collect each object in the stream into a list.
     // A stream allows you to perform operations on a list. With it, you can do things like
-    // filter/reduce, andmap, ormap, and a few other really useful operations.
+    // filter/reduce, andmap, ormap, and a few other really useful operations. You can still use a
+    // for loop like above though if you prefer!
     List<PostSummary> postSummaries =
         posts.stream().map(PostMapper::recordToSummary).collect(Collectors.toList());
 

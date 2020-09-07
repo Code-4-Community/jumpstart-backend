@@ -61,4 +61,12 @@ public interface ICommentTable {
    * @param commentId The ID of the comment to delete.
    */
   void deleteComment(int postId, int commentId);
+
+  /**
+   * Returns the number of comments that a post has.
+   *
+   * @param postId The ID of the post we want the comment count for.
+   * @return The number of comments the given post ID has.
+   */
+  int getCommentCountForPost(int postId);
 }

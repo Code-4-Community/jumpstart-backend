@@ -105,7 +105,7 @@ public class PostsRouter implements IRouter {
       end(ctx.response(), 200, JsonObject.mapFrom(response).encode());
     } catch (IllegalArgumentException e) {
       // Return a 404 NOT FOUND if post does not exist.
-      end(ctx.response(), 404, e.getMessage(), "text/plain");
+      end(ctx.response(), 404, e.getMessage());
     }
   }
 
@@ -161,14 +161,14 @@ public class PostsRouter implements IRouter {
     CreatePostRequest createPostRequest = getJsonBodyAsClass(ctx, CreatePostRequest.class);
     // Validate the DTO and ensure the provided info is valid.
     if (!createPostRequest.validate()) {
-      end(ctx.response(), 400, "Create Post fields cannot be null.", "text/plain");
+      end(ctx.response(), 400, "Create Post fields cannot be null.");
       return;
     }
 
     // Create the post using the processor.
     processor.createPost(createPostRequest);
-    // Return a success.
-    end(ctx.response(), 200, "Post created.", "text/plain");
+    // Return successfully created response (201).
+    end(ctx.response(), 201, "Post created.");
   }
 
   /**
@@ -190,14 +190,14 @@ public class PostsRouter implements IRouter {
     int postId = getRequestParameterAsInt(ctx.request(), "post_id");
     CreateCommentRequest comment = getJsonBodyAsClass(ctx, CreateCommentRequest.class);
     if (!comment.validate()) {
-      end(ctx.response(), 400, "Create Comment fields cannot be null.", "text/plain");
+      end(ctx.response(), 400, "Create Comment fields cannot be null.");
     }
 
     try {
       processor.createComment(postId, comment);
-      end(ctx.response(), 200, "Comment created.", "text/plain");
+      end(ctx.response(), 201, "Comment created.");
     } catch (IllegalArgumentException e) {
-      end(ctx.response(), 400, e.getMessage(), "text/plain");
+      end(ctx.response(), 400, e.getMessage());
     }
   }
 
@@ -223,7 +223,7 @@ public class PostsRouter implements IRouter {
       processor.clapPost(postId);
       end(ctx.response(), 204);
     } catch (IllegalArgumentException e) {
-      end(ctx.response(), 400, e.getMessage(), "text/plain");
+      end(ctx.response(), 400, e.getMessage());
     }
   }
 
@@ -250,7 +250,7 @@ public class PostsRouter implements IRouter {
       processor.clapComment(postId, commentId);
       end(ctx.response(), 204);
     } catch (IllegalArgumentException e) {
-      end(ctx.response(), 400, e.getMessage(), "text/plain");
+      end(ctx.response(), 400, e.getMessage());
     }
   }
 
@@ -276,7 +276,7 @@ public class PostsRouter implements IRouter {
       processor.deletePost(postId);
       end(ctx.response(), 204);
     } catch (IllegalArgumentException e) {
-      end(ctx.response(), 404, e.getMessage(), "text/plain");
+      end(ctx.response(), 404, e.getMessage());
     }
   }
 
@@ -303,7 +303,7 @@ public class PostsRouter implements IRouter {
       processor.deleteComment(postId, commentId);
       end(ctx.response(), 204);
     } catch (IllegalArgumentException e) {
-      end(ctx.response(), 404, e.getMessage(), "text/plain");
+      end(ctx.response(), 404, e.getMessage());
     }
   }
 }
