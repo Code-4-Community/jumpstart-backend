@@ -20,7 +20,7 @@ import java.util.Set;
  * to listen on some port (initially 8081).
  */
 public class ApiMain {
-  // The port that this application will start on. You can change this if you want!
+  /** The port that this application will start on. You can change this if you want! */
   public static final int defaultPort = 8081;
 
   public ApiMain() {}
