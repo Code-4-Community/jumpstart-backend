@@ -23,7 +23,11 @@ public class ApiMain {
   /** The port that this application will start on. You can change this if you want! */
   public static final int defaultPort = 8081;
 
-  public ApiMain() {}
+  private final IRouter apiRouter;
+
+  public ApiMain(IRouter apiRouter) {
+    this.apiRouter = apiRouter;
+  }
 
   /** The initialize the sub-router and start the API server. */
   public void startApi() {
@@ -81,6 +85,9 @@ public class ApiMain {
      */
     home.handler(this::handleHome);
 
+    // Mount a sub-router for routes that look like "/posts/*"
+    router.mountSubRouter("/posts", apiRouter.initializeRouter(vertx));
+
     // Start the server and listen on port :8081
     // (you can access this locally at http://localhost:8081)
     server.requestHandler(router).listen(defaultPort);
@@ -127,6 +134,8 @@ public class ApiMain {
 
     // Create the error message and return it.
     String message = String.format("Internal server error caused by :%s", throwable.getMessage());
+    // Print the stack trace for debugging purposes.
+    throwable.printStackTrace();
     // Ends this response using the static end method in IRouter.
     end(ctx.response(), 500, message);
   }
