@@ -64,7 +64,7 @@ public class StubCommentTableImpl implements ICommentTable {
   @Override
   public void saveComment(CommentRecord comment) {
     // Once we start using the database, these operations will be handled for us.
-    comment.setId(this.getNextId(comment.getPostId()) + 1);
+    comment.setId(this.getNextId(comment.getPostId()));
     comment.setDateCreated(Seeder.getCurrentDateTime());
     comment.setClapCount(0);
 

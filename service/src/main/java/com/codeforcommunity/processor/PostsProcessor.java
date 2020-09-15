@@ -45,7 +45,24 @@ public class PostsProcessor implements IPostsProcessor {
    */
   private void checkPostExists(int postId) {
     if (!postTable.postExists(postId)) {
-      throw new IllegalArgumentException("Post with id " + postId + " does not exist.");
+      throw new IllegalArgumentException("No post with id " + postId + " does not exist.");
+    }
+  }
+
+  /**
+   * Determine if the given comment exists for the given posts and throw an exception if it doesn't.
+   *
+   * @param postId The ID the comment should belong to.
+   * @param commentId The ID of the comment to check.
+   */
+  private void checkCommentExists(int postId, int commentId) {
+    if (!commentTable.commentExists(postId, commentId)) {
+      throw new IllegalArgumentException(
+          "No comment with post id "
+              + postId
+              + " and comment id "
+              + commentId
+              + " does not exist.");
     }
   }
 
@@ -114,10 +131,7 @@ public class PostsProcessor implements IPostsProcessor {
   @Override
   public void clapComment(int postId, int commentId) {
     this.checkPostExists(postId);
-
-    if (!commentTable.commentExists(postId, commentId)) {
-      throw new IllegalArgumentException("Comment with id " + commentId + " does not exist.");
-    }
+    this.checkCommentExists(postId, commentId);
 
     commentTable.clapComment(postId, commentId);
   }
@@ -136,10 +150,7 @@ public class PostsProcessor implements IPostsProcessor {
   @Override
   public void deleteComment(int postId, int commentId) {
     this.checkPostExists(postId);
-
-    if (!commentTable.commentExists(postId, commentId)) {
-      throw new IllegalArgumentException("Comment with id " + commentId + " does not exist.");
-    }
+    this.checkCommentExists(postId, commentId);
 
     commentTable.deleteComment(postId, commentId);
   }
