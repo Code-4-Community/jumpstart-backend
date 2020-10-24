@@ -45,7 +45,7 @@ public class PostsProcessor implements IPostsProcessor {
    */
   private void checkPostExists(int postId) {
     if (!postTable.postExists(postId)) {
-      throw new IllegalArgumentException("No post with id " + postId + " does not exist.");
+      throw new IllegalArgumentException("No post with id " + postId + " exists.");
     }
   }
 
@@ -62,7 +62,7 @@ public class PostsProcessor implements IPostsProcessor {
               + postId
               + " and comment id "
               + commentId
-              + " does not exist.");
+              + " exists.");
     }
   }
 
