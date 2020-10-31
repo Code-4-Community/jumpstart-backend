@@ -46,7 +46,7 @@ public class StubPostTableImpl implements IPostTable {
    *   }
    * </pre>
    */
-  private final Map<Integer, PostRecord> postMap;
+  protected final Map<Integer, PostRecord> postMap;
 
   public StubPostTableImpl() {
     this.postMap = new HashMap<>();

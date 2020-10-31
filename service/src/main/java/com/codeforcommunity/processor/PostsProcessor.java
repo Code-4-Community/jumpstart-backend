@@ -58,11 +58,7 @@ public class PostsProcessor implements IPostsProcessor {
   private void checkCommentExists(int postId, int commentId) {
     if (!commentTable.commentExists(postId, commentId)) {
       throw new IllegalArgumentException(
-          "No comment with post id "
-              + postId
-              + " and comment id "
-              + commentId
-              + " exists.");
+          "No comment with post id " + postId + " and comment id " + commentId + " exists.");
     }
   }
 
