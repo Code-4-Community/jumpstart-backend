@@ -41,7 +41,11 @@ public class Comment {
   }
 
   public Integer getClapCount() {
-    return clapCount;
+    return this.clapCount;
+  }
+
+  public void incrementClapCount() {
+    this.clapCount++;
   }
 
   public String getBody() {

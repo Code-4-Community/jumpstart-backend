@@ -32,7 +32,11 @@ public class SinglePostResponse {
   }
 
   public Integer getClapCount() {
-    return clapCount;
+    return this.clapCount;
+  }
+
+  public void incrementClapCount() {
+    this.clapCount++;
   }
 
   public String getBody() {

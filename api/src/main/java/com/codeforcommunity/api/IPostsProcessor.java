@@ -1,5 +1,7 @@
 package com.codeforcommunity.api;
 
+import com.codeforcommunity.dto.request.CreateCommentRequest;
+import com.codeforcommunity.dto.request.CreatePostRequest;
 import com.codeforcommunity.dto.response.CommentsResponse;
 import com.codeforcommunity.dto.response.PostsResponse;
 import com.codeforcommunity.dto.response.SinglePostResponse;
@@ -37,4 +39,49 @@ public interface IPostsProcessor {
    * @return The list of comments.
    */
   CommentsResponse getCommentsForPost(int postId);
+
+  /**
+   * Save the provided post to the database.
+   *
+   * @param post The post to save.
+   */
+  void createPost(CreatePostRequest post);
+
+  /**
+   * Save the provided context to the database under the provided postId.
+   *
+   * @param postId The ID of the post the comment is under.
+   * @param comment The comment to save.
+   */
+  void createComment(int postId, CreateCommentRequest comment);
+
+  /**
+   * Increment the post's clap count by 1.
+   *
+   * @param postId The ID of the post to clap.
+   */
+  void clapPost(int postId);
+
+  /**
+   * Increment the comment's clap count by 1.
+   *
+   * @param postId The ID of the post to clap.
+   * @param commentId The ID of the comment to clap.
+   */
+  void clapComment(int postId, int commentId);
+
+  /**
+   * Delete the post with the given ID.
+   *
+   * @param postId The ID of the post to delete.
+   */
+  void deletePost(int postId);
+
+  /**
+   * Delete the comment related to the given IDs.
+   *
+   * @param postId The ID of the post the comment belongs to.
+   * @param commentId The ID of the comment to delete.
+   */
+  void deleteComment(int postId, int commentId);
 }

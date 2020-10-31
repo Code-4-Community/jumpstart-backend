@@ -1,6 +1,7 @@
 package com.codeforcommunity.database.tableImpl;
 
 import com.codeforcommunity.database.records.PostRecord;
+import com.codeforcommunity.database.seeder.Seeder;
 import com.codeforcommunity.database.table.IPostTable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +72,12 @@ public class StubPostTableImpl implements IPostTable {
 
   @Override
   public void savePost(PostRecord post) {
-    // Put (or replace) the post object by the given ID.
+    // Once we start using the database, these operations will be handled for us.
+    post.setId(this.getNextId());
+    post.setDateCreated(Seeder.getCurrentDateTime());
+    post.setClapCount(0);
+    post.setCommentCount(0);
+
     this.postMap.put(post.getId(), post);
   }
 
@@ -79,5 +85,40 @@ public class StubPostTableImpl implements IPostTable {
   public boolean postExists(int postId) {
     // See if a post with the given ID exists.
     return this.postMap.containsKey(postId);
+  }
+
+  @Override
+  public void clapPost(int postId) {
+    if (!this.postExists(postId)) {
+      throw new IllegalArgumentException("No post with ID " + postId + " exists");
+    }
+
+    PostRecord record = postMap.get(postId);
+    record.setClapCount(record.getClapCount() + 1);
+  }
+
+  @Override
+  public void deletePost(int postId) {
+    if (!this.postExists(postId)) {
+      throw new IllegalArgumentException("No post with ID " + postId + " exists");
+    }
+
+    postMap.remove(postId);
+  }
+
+  /**
+   * Get the ID after the most recently inserted item. This is so that we can artificially assign a
+   * valid ID to the next item being inserted.
+   *
+   * @return An integer representing the most recent ID.
+   */
+  private int getNextId() {
+    int max = -1;
+    for (Integer id : this.postMap.keySet()) {
+      if (id > max) {
+        max = id;
+      }
+    }
+    return max + 1;
   }
 }

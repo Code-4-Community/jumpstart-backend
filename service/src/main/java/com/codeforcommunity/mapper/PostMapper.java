@@ -1,6 +1,7 @@
 package com.codeforcommunity.mapper;
 
 import com.codeforcommunity.database.records.PostRecord;
+import com.codeforcommunity.dto.request.CreatePostRequest;
 import com.codeforcommunity.dto.response.PostSummary;
 import com.codeforcommunity.dto.response.SinglePostResponse;
 import com.codeforcommunity.processor.PostsProcessor;
@@ -39,5 +40,15 @@ public class PostMapper {
         record.getClapCount(),
         PostsProcessor.getBodyPreview(record.getBody()),
         record.getCommentCount());
+  }
+
+  /**
+   * Map from a {@link CreatePostRequest} to a {@link PostRecord}.
+   *
+   * @param request The request to map.
+   * @return The mapped record.
+   */
+  public static PostRecord createRequestToRecord(CreatePostRequest request) {
+    return new PostRecord(request.getAuthor(), request.getTitle(), request.getBody());
   }
 }

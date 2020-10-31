@@ -27,4 +27,46 @@ public interface ICommentTable {
    * @param comment The comment to save.
    */
   void saveComment(CommentRecord comment);
+
+  /**
+   * Determine if the given id belongs to an existing comment.
+   *
+   * @param postId The ID the comment belongs to.
+   * @param commentId The ID of the comment to check.
+   * @return True if the comment exists, false otherwise.
+   */
+  boolean commentExists(int postId, int commentId);
+
+  /**
+   * Clap the given comment with the provided IDs if it exists. This method assumes the comment
+   * exists.
+   *
+   * @param postId The ID of the post the comment belongs to.
+   * @param commentId The ID of the comment to clap.
+   */
+  void clapComment(int postId, int commentId);
+
+  /**
+   * Delete all of the comments belonging to the given post.
+   *
+   * @param postId The ID of the post to delete comments for.
+   */
+  void deleteCommentsByPostId(int postId);
+
+  /**
+   * Delete the comment related to the given IDs. This method assumes that the post exists and has
+   * comments.
+   *
+   * @param postId The ID of the post the comment belongs to.
+   * @param commentId The ID of the comment to delete.
+   */
+  void deleteComment(int postId, int commentId);
+
+  /**
+   * Returns the number of comments that a post has.
+   *
+   * @param postId The ID of the post we want the comment count for.
+   * @return The number of comments the given post ID has.
+   */
+  int getCommentCountForPost(int postId);
 }

@@ -1,9 +1,12 @@
 package com.codeforcommunity.rest;
 
 import static com.codeforcommunity.rest.IRouter.end;
+import static com.codeforcommunity.rest.RequestUtils.getJsonBodyAsClass;
 import static com.codeforcommunity.rest.RequestUtils.getRequestParameterAsInt;
 
 import com.codeforcommunity.api.IPostsProcessor;
+import com.codeforcommunity.dto.request.CreateCommentRequest;
+import com.codeforcommunity.dto.request.CreatePostRequest;
 import com.codeforcommunity.dto.response.CommentsResponse;
 import com.codeforcommunity.dto.response.PostsResponse;
 import com.codeforcommunity.dto.response.SinglePostResponse;
@@ -30,6 +33,12 @@ public class PostsRouter implements IRouter {
     this.registerGetPostsRoute(router);
     this.registerGetSinglePostRoute(router);
     this.registerGetCommentsForPostRoute(router);
+    this.registerPostPostsRoute(router);
+    this.registerPostCommentsRoute(router);
+    this.registerClapPostRoute(router);
+    this.registerClapCommentRoute(router);
+    this.registerDeletePostRoute(router);
+    this.registerDeleteCommentRoute(router);
 
     return router;
   }
@@ -96,7 +105,7 @@ public class PostsRouter implements IRouter {
       end(ctx.response(), 200, JsonObject.mapFrom(response).encode());
     } catch (IllegalArgumentException e) {
       // Return a 404 NOT FOUND if post does not exist.
-      end(ctx.response(), 404, "Post with ID " + postId + " not found");
+      end(ctx.response(), 404, e.getMessage());
     }
   }
 
@@ -128,6 +137,172 @@ public class PostsRouter implements IRouter {
     } catch (IllegalArgumentException e) {
       // If an exception was thrown because there was no existing post with the given id, then end
       // with a 404 NOT FOUND.
+      end(ctx.response(), 404, e.getMessage());
+    }
+  }
+
+  /**
+   * Register the POST "/posts" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerPostPostsRoute(Router router) {
+    Route route = router.post("/");
+    route.handler(this::handlePostPostsRoute);
+  }
+
+  /**
+   * Handle the POST "/posts" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handlePostPostsRoute(RoutingContext ctx) {
+    // Unmarshal the request body as a CreatePostRequest class.
+    CreatePostRequest createPostRequest = getJsonBodyAsClass(ctx, CreatePostRequest.class);
+    // Validate the DTO and ensure the provided info is valid.
+    if (!createPostRequest.validate()) {
+      end(ctx.response(), 400, "Create Post fields cannot be null.");
+      return;
+    }
+
+    // Create the post using the processor.
+    processor.createPost(createPostRequest);
+    // Return successfully created response (201).
+    end(ctx.response(), 201, "Post created.");
+  }
+
+  /**
+   * Register the POST "/posts/:post_id/comments" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerPostCommentsRoute(Router router) {
+    Route route = router.post("/:post_id/comments");
+    route.handler(this::handlePostCommentsRoute);
+  }
+
+  /**
+   * Handle the POST "/posts/:post_id/comments" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handlePostCommentsRoute(RoutingContext ctx) {
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+    CreateCommentRequest comment = getJsonBodyAsClass(ctx, CreateCommentRequest.class);
+    if (!comment.validate()) {
+      end(ctx.response(), 400, "Create Comment fields cannot be null.");
+    }
+
+    try {
+      processor.createComment(postId, comment);
+      end(ctx.response(), 201, "Comment created.");
+    } catch (IllegalArgumentException e) {
+      end(ctx.response(), 400, e.getMessage());
+    }
+  }
+
+  /**
+   * Register the POST "/posts/:post_id/clap" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerClapPostRoute(Router router) {
+    Route route = router.post("/:post_id/clap");
+    route.handler(this::handleClapPost);
+  }
+
+  /**
+   * Handle the POST "/posts/:post_id/clap" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handleClapPost(RoutingContext ctx) {
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+
+    try {
+      processor.clapPost(postId);
+      end(ctx.response(), 204);
+    } catch (IllegalArgumentException e) {
+      end(ctx.response(), 400, e.getMessage());
+    }
+  }
+
+  /**
+   * Register the POST "/posts/:post_id/comments/:comment_id/clap" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerClapCommentRoute(Router router) {
+    Route route = router.post("/:post_id/comments/:comment_id/clap");
+    route.handler(this::handleClapComment);
+  }
+
+  /**
+   * Handle the POST "/posts/:post_id/comments/:comment_id/clap" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handleClapComment(RoutingContext ctx) {
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+    int commentId = getRequestParameterAsInt(ctx.request(), "comment_id");
+
+    try {
+      processor.clapComment(postId, commentId);
+      end(ctx.response(), 204);
+    } catch (IllegalArgumentException e) {
+      end(ctx.response(), 400, e.getMessage());
+    }
+  }
+
+  /**
+   * Register the DELETE "/posts/:post_id" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerDeletePostRoute(Router router) {
+    Route route = router.delete("/:post_id");
+    route.handler(this::handleDeletePostRoute);
+  }
+
+  /**
+   * Handle the DELETE "/posts/:post_id" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handleDeletePostRoute(RoutingContext ctx) {
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+
+    try {
+      processor.deletePost(postId);
+      end(ctx.response(), 204);
+    } catch (IllegalArgumentException e) {
+      end(ctx.response(), 404, e.getMessage());
+    }
+  }
+
+  /**
+   * Register the DELETE "/posts/:post_id/comments/:comment_id" route.
+   *
+   * @param router The Router to register the route with.
+   */
+  private void registerDeleteCommentRoute(Router router) {
+    Route route = router.delete("/:post_id/comments/:comment_id");
+    route.handler(this::handleDeleteCommentRoute);
+  }
+
+  /**
+   * Handle the DELETE "/posts/:post_id/comments/:comment_id" route.
+   *
+   * @param ctx The {@link RoutingContext} containing all relevant routing info.
+   */
+  private void handleDeleteCommentRoute(RoutingContext ctx) {
+    int postId = getRequestParameterAsInt(ctx.request(), "post_id");
+    int commentId = getRequestParameterAsInt(ctx.request(), "comment_id");
+
+    try {
+      processor.deleteComment(postId, commentId);
+      end(ctx.response(), 204);
+    } catch (IllegalArgumentException e) {
       end(ctx.response(), 404, e.getMessage());
     }
   }

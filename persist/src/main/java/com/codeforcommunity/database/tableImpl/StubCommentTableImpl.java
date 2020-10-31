@@ -1,6 +1,7 @@
 package com.codeforcommunity.database.tableImpl;
 
 import com.codeforcommunity.database.records.CommentRecord;
+import com.codeforcommunity.database.seeder.Seeder;
 import com.codeforcommunity.database.table.ICommentTable;
 import java.util.HashMap;
 import java.util.List;
@@ -62,10 +63,76 @@ public class StubCommentTableImpl implements ICommentTable {
 
   @Override
   public void saveComment(CommentRecord comment) {
+    // Once we start using the database, these operations will be handled for us.
+    comment.setId(this.getNextId(comment.getPostId()));
+    comment.setDateCreated(Seeder.getCurrentDateTime());
+    comment.setClapCount(0);
+
     // Get the list of comments pertaining to the comment's post id. If empty, create a new list to
     // store comments in.
     commentMap.putIfAbsent(comment.getPostId(), new HashMap<>());
     // Add the given comment to our (possibly newly created) list.
     commentMap.get(comment.getPostId()).put(comment.getId(), comment);
+  }
+
+  @Override
+  public boolean commentExists(int postId, int commentId) {
+    // Determine if the given post has comments, and if so, determine if there are any with the
+    // given id.
+    return commentMap.containsKey(postId) && commentMap.get(postId).containsKey(commentId);
+  }
+
+  @Override
+  public void clapComment(int postId, int commentId) {
+    if (!this.commentExists(postId, commentId)) {
+      throw new IllegalArgumentException(
+          "No comment with ID " + commentId + " exists for post with ID " + postId);
+    }
+
+    // Get the comments relating to the post.
+    Map<Integer, CommentRecord> comments = commentMap.get(postId);
+    // Find the comment with the given commentId.
+    CommentRecord record = comments.get(commentId);
+    record.setClapCount(record.getClapCount() + 1);
+  }
+
+  @Override
+  public void deleteCommentsByPostId(int postId) {
+    commentMap.remove(postId);
+  }
+
+  @Override
+  public void deleteComment(int postId, int commentId) {
+    if (!this.commentExists(postId, commentId)) {
+      throw new IllegalArgumentException(
+          "No comment with ID " + commentId + " exists for post with ID " + postId);
+    }
+
+    // Remove the comment from the list of comments related to the postId.
+    commentMap.get(postId).remove(commentId);
+  }
+
+  @Override
+  public int getCommentCountForPost(int postId) {
+    Map<Integer, CommentRecord> comments = this.commentMap.getOrDefault(postId, new HashMap<>());
+    return comments.size();
+  }
+
+  /**
+   * Get the ID after the most recently inserted item. This is so that we can artificially assign a
+   * valid ID to the next item being inserted.
+   *
+   * @return An integer representing the most recent ID.
+   */
+  private int getNextId(int postId) {
+    Map<Integer, CommentRecord> postComments =
+        this.commentMap.getOrDefault(postId, new HashMap<>());
+    int max = -1;
+    for (Integer id : postComments.keySet()) {
+      if (id > max) {
+        max = id;
+      }
+    }
+    return max + 1;
   }
 }
