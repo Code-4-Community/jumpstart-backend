@@ -90,6 +90,7 @@ public class PostsProcessor implements IPostsProcessor {
 
     // Return the post with the given postId.
     PostRecord post = postTable.getById(postId);
+    post.setCommentCount(commentTable.getCommentCountForPost(post.getId()));
     return PostMapper.recordToResponse(post);
   }
 
