@@ -39,11 +39,12 @@ public class ServiceMain {
 
   /** Starts the server and initializes things that need to be initialized. */
   public void initialize() {
-    initializeServer();
+    int port = this.getPort();
+    initializeServer(port);
   }
 
   /** Sets up values that are needed and starts the API server. */
-  private void initializeServer() {
+  private void initializeServer(int port) {
     // Get our DB properties so they can be provided to the database table impl classes.
     Properties properties = PropertiesLoader.getDbProperties();
     IPostTable postTable = new PostTableDBImpl(properties);
@@ -52,6 +53,11 @@ public class ServiceMain {
     IPostsProcessor postsProcessor = new PostsProcessor(postTable, commentTable);
     IRouter postsRouter = new PostsRouter(postsProcessor);
     ApiMain apiMain = new ApiMain(postsRouter);
-    apiMain.startApi();
+    apiMain.startApi(port);
+  }
+
+  private int getPort() {
+    String portString = System.getenv().getOrDefault("PORT", "8081");
+    return Integer.parseInt(portString);
   }
 }
