@@ -2,6 +2,8 @@ package com.codeforcommunity.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Properties;
 
 /**
@@ -34,6 +36,22 @@ public class PropertiesLoader {
 
   /** Get properties for the database from the db.properties file. */
   public static Properties getDbProperties() {
+    String dbUrlProp = System.getenv("JDBC_DATABASE_URL");
+    if (dbUrlProp != null) {
+      Properties prop = new Properties();
+
+      prop.setProperty("database.url", dbUrlProp);
+
+      return prop;
+    }
     return getProperties("db.properties");
+  }
+
+  public static int getServerPort() {
+    String port = System.getenv("PORT");
+    if (port == null) {
+      port = getProperties("server.properties").getProperty("server.port");
+    }
+    return Integer.parseInt(port);
   }
 }

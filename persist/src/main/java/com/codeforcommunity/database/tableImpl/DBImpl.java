@@ -36,12 +36,6 @@ abstract class DBImpl {
     if (this.url == null) {
       throw new IllegalArgumentException("Database URL cannot be null.");
     }
-    if (this.user == null) {
-      throw new IllegalArgumentException("Database user cannot be null.");
-    }
-    if (this.password == null) {
-      throw new IllegalArgumentException("Database password cannot be null");
-    }
   }
 
   /**
