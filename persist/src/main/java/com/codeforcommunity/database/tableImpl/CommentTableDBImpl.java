@@ -54,7 +54,11 @@ public class CommentTableDBImpl extends DBImpl implements ICommentTable {
       // Create our SQL string. This one gets all of the fields of a Post by a given ID.
       // The '?' allows us to safely insert that variable into the query without having to worry
       // about escaping any special characters inside.
-      String sql = "SELECT * FROM comments WHERE post_id = ?;";
+      String sql =
+          "SELECT * FROM comments "
+              + "LEFT JOIN (SELECT comment_id, COUNT(*) AS clap_count FROM comment_claps GROUP BY comment_id) claps "
+              + "ON comments.id = claps.comment_id "
+              + "WHERE post_id = ?;";
       // A PreparedStatement is the technique that allows us to insert variables by '?'.
       PreparedStatement stmt = conn.prepareStatement(sql);
       // Set the first '?' = id. Note how in prepared statements, parameters are not 0-indexed.
@@ -130,7 +134,7 @@ public class CommentTableDBImpl extends DBImpl implements ICommentTable {
       Connection conn = getConnection();
       // Here, we're updating the rows in the post table by the given id
       // by incrementing the clap count.
-      String sql = "UPDATE comments SET clap_count = clap_count + 1 WHERE post_id = ? AND id = ?;";
+      String sql = "INSERT INTO comment_claps (post_id, comment_id) VALUES (?, ?);";
       PreparedStatement stmt = conn.prepareStatement(sql);
       stmt.setInt(1, postId);
       stmt.setInt(2, commentId);
