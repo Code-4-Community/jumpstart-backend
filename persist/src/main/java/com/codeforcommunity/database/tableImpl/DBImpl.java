@@ -36,6 +36,8 @@ abstract class DBImpl {
     if (this.url == null) {
       throw new IllegalArgumentException("Database URL cannot be null.");
     }
+    // We got rid of checks for username and password since that information can be contained
+    // in the database url.
   }
 
   /**

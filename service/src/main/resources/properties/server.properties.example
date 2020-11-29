@@ -1,1 +1,5 @@
+# Sets the port we're going to be using to start up. We've moved it outside of ApiMain since
+# Heroku defines a port for you to use when your program starts up in an environment variable.
+# If you try to use a port other than the Heroku-provided one, your program will be killed.
+
 server.port = 8081

@@ -34,5 +34,7 @@ hs_err_pid*
 
 # Properties Files
 *.properties
-!system.properties
 .env
+
+# Add an exception to the system.properties file (all other .properties files will be ignored)
+!system.properties
