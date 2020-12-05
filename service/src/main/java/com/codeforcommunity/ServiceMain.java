@@ -52,6 +52,7 @@ public class ServiceMain {
     IPostsProcessor postsProcessor = new PostsProcessor(postTable, commentTable);
     IRouter postsRouter = new PostsRouter(postsProcessor);
     ApiMain apiMain = new ApiMain(postsRouter);
-    apiMain.startApi();
+    // Start our ApiMain up and pass in the server port from the system variable or properties file.
+    apiMain.startApi(PropertiesLoader.getServerPort());
   }
 }

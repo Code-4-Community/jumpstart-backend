@@ -20,17 +20,18 @@ import java.util.Set;
  * to listen on some port (initially 8081).
  */
 public class ApiMain {
-  /** The port that this application will start on. You can change this if you want! */
-  public static final int defaultPort = 8081;
-
   private final IRouter apiRouter;
 
   public ApiMain(IRouter apiRouter) {
     this.apiRouter = apiRouter;
   }
 
-  /** The initialize the sub-router and start the API server. */
-  public void startApi() {
+  /**
+   * Initialize the sub-router and start the API server.
+   *
+   * @param port The port to start the program up on.
+   */
+  public void startApi(int port) {
     // Get a 'Vertx' object. This will provide us an HttpServer and Router.
     Vertx vertx = Vertx.vertx();
     // Get an HttpServer from the Vertx object.
@@ -88,12 +89,12 @@ public class ApiMain {
     // Mount a sub-router for routes that look like "/posts/*"
     router.mountSubRouter("/posts", apiRouter.initializeRouter(vertx));
 
-    // Start the server and listen on port :8081
+    // Start the server and listen on the port provided by ServiceMain (default 8081).
     // (you can access this locally at http://localhost:8081)
-    server.requestHandler(router).listen(defaultPort);
+    server.requestHandler(router).listen(port);
 
     // Let the user know the server has started
-    System.out.println("Hey! The server has started on port " + defaultPort);
+    System.out.println("Hey! The server has started on port " + port);
   }
 
   /**
